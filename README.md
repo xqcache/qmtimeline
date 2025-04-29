@@ -28,3 +28,32 @@ class QmTLGraphicsVideo;
 class QmTLGraphicsAudio;
 
 ```
+
+
+
+```json
+{
+    "[css]": {
+        "editor.formatOnSave": false
+    },
+    "clangd.arguments": [
+        "--header-insertion=never",
+        "--clang-tidy",
+        "--fallback-style=WebKit",
+        // 指定clangd查找compile_commands.json的路径
+        "--compile-commands-dir=${workspaceFolder}/build-dbg"
+    ],
+    "cmake.configureArgs": [
+        // 生成compile_commands.json
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+    ],
+    "cmake.debugConfig": {
+        "sourceFileMap": {
+            // Qt源码路径映射。调试时可以进入Qt源码
+            "c:\\Users\\qt\\work\\qt": "D:\\Qt\\6.8.1\\Src"
+        },
+        "visualizerFile": "${workspaceFolder}/.vscode/qt6.natvis",
+        "displayString": true
+    }
+}
+```

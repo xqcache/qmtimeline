@@ -93,12 +93,14 @@ bool QmTLGraphicsView::event(QEvent* event)
     } break;
     case QEvent::Wheel: {
         QWheelEvent* old_evt = static_cast<QWheelEvent*>(event);
-        if (old_evt->modifiers() == Qt::NoModifier) {
+        if (old_evt->modifiers() == Qt::ControlModifier) {
             QWheelEvent* new_evt = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(), old_evt->pixelDelta(), old_evt->angleDelta(),
                 old_evt->buttons(), old_evt->modifiers(), old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
             qApp->sendEvent(viewport(), new_evt);
             return true;
         }
+        QAbstractScrollArea::wheelEvent(old_evt);
+        return true;
     } break;
     default:
         break;

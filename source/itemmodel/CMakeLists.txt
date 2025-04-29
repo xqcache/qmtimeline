@@ -1,4 +1,5 @@
 set(PRIVATE_SOURCES
+    qmtlitemmodel_p.h
     qmtlitemmodel.h
     qmtlitemmodel.cpp
     qmtlframeitemmodel.h

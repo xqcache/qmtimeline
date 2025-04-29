@@ -65,6 +65,7 @@ void QmTLDateTimeAxis::setTickUnit(qint64 tick_unit)
     }
     d_->tick_unit = tick_unit;
     updateTickArea();
+    emit tickUnitChanged(tick_unit);
 }
 
 void QmTLDateTimeAxis::setTickLabelInterval(int tick_label_interval)

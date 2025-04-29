@@ -3,6 +3,7 @@
 #include "qmtlgraphicsscene.h"
 #include <QPainter>
 #include <QResizeEvent>
+#include <QScrollBar>
 #include <QWheelEvent>
 
 struct QmTLGraphicsViewPrivate {
@@ -78,9 +79,6 @@ void QmTLGraphicsView::setupSignals()
 
 bool QmTLGraphicsView::event(QEvent* event)
 {
-
-    static int count = 0;
-
     switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
@@ -113,14 +111,6 @@ void QmTLGraphicsView::resizeEvent(QResizeEvent* event)
     QGraphicsView::resizeEvent(event);
     d_->axis->resize(viewport()->width(), height());
     setViewportMargins(0, d_->axis->cursorHeight(), 0, 0);
-}
-
-void QmTLGraphicsView::onAxisScaleChanged()
-{
-    if (!scene()) {
-        return;
-    }
-    static_cast<QmTLGraphicsScene*>(scene())->fitInAxis();
 }
 
 void QmTLGraphicsView::drawBackground(QPainter* painter, const QRectF& rect)

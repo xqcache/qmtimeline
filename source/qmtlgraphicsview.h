@@ -29,9 +29,6 @@ private:
     void initUi();
     void setupSignals();
 
-private slots:
-    void onAxisScaleChanged();
-
 private:
     QmTLGraphicsViewPrivate* d_ { nullptr };
 };

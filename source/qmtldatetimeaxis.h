@@ -32,6 +32,7 @@ public:
     qint64 timeKey() const;
 
 signals:
+    void tickUnitChanged(qint64 tick_unit);
     void visualChanged(qint64 visual_min);
     void scaleChanged();
 

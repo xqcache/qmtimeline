@@ -71,6 +71,8 @@ void QmTLGraphicsView::initUi()
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setFrameShape(QFrame::NoFrame);
+
+    setBackgroundBrush(QColor("#BDBDBD"));
 }
 
 void QmTLGraphicsView::setupSignals()
@@ -109,7 +111,7 @@ bool QmTLGraphicsView::event(QEvent* event)
 void QmTLGraphicsView::resizeEvent(QResizeEvent* event)
 {
     QGraphicsView::resizeEvent(event);
-    d_->axis->resize(viewport()->width(), height());
+    d_->axis->resize(viewport()->width(), viewport()->geometry().bottom());
     setViewportMargins(0, d_->axis->cursorHeight(), 0, 0);
 }
 

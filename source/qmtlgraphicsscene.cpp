@@ -22,6 +22,7 @@ QmTLGraphicsScene::QmTLGraphicsScene(QObject* parent)
     : QGraphicsScene(parent)
     , d_(new QmTLGraphicsScenePrivate)
 {
+    // TODO: 后期需要根据Axis Timekey的最大值来确定宽度
     setSceneRect(0, 0, 20000, 20000);
 }
 
@@ -75,11 +76,11 @@ void QmTLGraphicsScene::setModel(QmTLGraphicsModel* model)
     d_->model_signals.clear();
     d_->model = model;
 
-    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemCreated,
-        this, &QmTLGraphicsScene::onItemCreated));
+    d_->model_signals.append(
+        connect(d_->model, &QmTLGraphicsModel::itemCreated, this, &QmTLGraphicsScene::onItemCreated));
 
-    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemChanged,
-        this, &QmTLGraphicsScene::onItemChanged));
+    d_->model_signals.append(
+        connect(d_->model, &QmTLGraphicsModel::itemChanged, this, &QmTLGraphicsScene::onItemChanged));
 }
 
 QmTLGraphicsModel* QmTLGraphicsScene::model() const
@@ -117,7 +118,7 @@ void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles role
         if (!item_model) {
             return;
         }
-        item->setX(mapToAxisX(item_model->data().timeKey()));
+        item->setPos(mapToAxisX(item_model->data().timeKey()), 10);
     }
 }
 
@@ -148,6 +149,12 @@ void QmTLGraphicsScene::fitInAxis()
     for (const auto& [_, item] : d_->items) {
         item->fitInAxis();
     }
+}
+
+qreal QmTLGraphicsScene::itemHeight(QmTLItemID item_id) const
+{
+    // TODO: 待实现
+    return 100;
 }
 
 void QmTLGraphicsScene::updateItem(QmTLItemID item_id)

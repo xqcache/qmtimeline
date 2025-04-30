@@ -10,10 +10,12 @@ public:
     nlohmann::json save() const override;
 
     void setDelay(int delay);
-    const std::optional<int>& delay() const;
+    const std::optional<qint64>& delay() const;
+    qint64 delayValue(qint64 def_val) const;
+
     bool hasDelay() const;
     void clearDelay();
 
 private:
-    std::optional<int> delay_;
+    std::optional<qint64> delay_;
 };

@@ -16,8 +16,15 @@ public:
     bool load(const nlohmann::json& json);
     void save(nlohmann::json& json) const;
 
-    QmTLItemModel* itemModel(QmTLItemID item_id) const;
     QmTLItemID createItem(int type);
+    QmTLItemModel* itemModel(QmTLItemID item_id) const;
+
+    template <typename T>
+        requires(std::is_base_of_v<QmTLItemModel, T>)
+    T* itemModel(QmTLItemID item_id) const
+    {
+        return static_cast<T*>(itemModel(item_id));
+    }
 
     void setItemData(QmTLItemID item_id, const QVariant& value, QmTLItemDataRole role);
     void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemDataRole::All);

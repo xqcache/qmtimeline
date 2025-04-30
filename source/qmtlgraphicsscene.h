@@ -27,6 +27,8 @@ public:
     void setScaleFactorRange(qreal min, qreal max);
 
     void fitInAxis();
+
+    qreal itemHeight(QmTLItemID item_id) const;
     void updateItem(QmTLItemID item_id);
     QmTLGraphicsItem* graphItem(QmTLItemID item_id) const;
 

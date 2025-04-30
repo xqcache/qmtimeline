@@ -17,7 +17,7 @@ struct QmTLDateTimeAxisPrivate {
     // 每隔10个刻度显示一个标签
     int tick_label_interval { 10 };
     // 每个刻度的像素宽度
-    qreal tick_pixels { 12 };
+    qreal tick_pixels { 20 };
 
     // 时间刻度标签格式
     QString tick_format { "HH:mm:ss.zz" };
@@ -59,7 +59,7 @@ void QmTLDateTimeAxis::setTickPixels(qreal tick_pixels)
 
 void QmTLDateTimeAxis::setTickUnit(qint64 tick_unit)
 {
-    tick_unit = qMax(1, tick_unit);
+    tick_unit = qMax(static_cast<qint64>(d_->tick_pixels), tick_unit);
     if (d_->tick_unit == tick_unit) {
         return;
     }
@@ -270,6 +270,14 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
             if (i % d_->tick_label_interval == 0) {
                 qreal x = i * d_->tick_pixels + d_->cursor_size.width() / 2;
                 painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, d_->cursor_size.height() * 0.9));
+                // {
+                //     painter.save();
+                //     QPen grid_pen(Qt::gray, 1.0);
+                //     painter.setPen(grid_pen);
+                //     painter.setOpacity(0.8);
+                //     painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, height()));
+                //     painter.restore();
+                // }
                 QDateTime dt = dt_start.addMSecs(i * d_->tick_unit);
                 QString label = dt.toString(d_->tick_format);
                 qreal label_width = painter.fontMetrics().horizontalAdvance(label);
@@ -284,7 +292,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
 
     {
         // 绘制光标
-        QColor color(Qt::GlobalColor::red);
+        QColor color(Qt::black);
         color.setAlpha(100);
         painter.save();
         painter.setPen(Qt::NoPen);
@@ -293,7 +301,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         painter.restore();
 
         painter.save();
-        painter.setPen(QPen(Qt::darkGray, d_->cursor_line_width));
+        painter.setPen(QPen(Qt::black, d_->cursor_line_width));
         painter.drawPath(cursorTailShape());
         painter.restore();
 

@@ -16,5 +16,8 @@ public:
     void fitInAxis() override;
 
 private:
+    void drawDelay(QPainter* painter);
+
+private:
     QmTLGraphicsFrameItemPrivate* d_ { nullptr };
 };

@@ -17,9 +17,14 @@ void QmTLFrameItemData::setDelay(int delay)
     delay_ = delay;
 }
 
-const std::optional<int>& QmTLFrameItemData::delay() const
+const std::optional<qint64>& QmTLFrameItemData::delay() const
 {
     return delay_;
+}
+
+qint64 QmTLFrameItemData::delayValue(qint64 def_val) const
+{
+    return delay_.value_or(def_val);
 }
 
 bool QmTLFrameItemData::hasDelay() const

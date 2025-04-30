@@ -18,6 +18,20 @@ public:
     virtual QmTLItemData& data();
     virtual const QmTLItemData& data() const;
 
+    template <typename T>
+        requires(std::is_base_of_v<QmTLItemData, T>)
+    T& data()
+    {
+        return static_cast<T&>(data());
+    }
+
+    template <typename T>
+        requires(std::is_base_of_v<QmTLItemData, T>)
+    const T& data() const
+    {
+        return static_cast<T&>(data());
+    }
+
     enum {
         Type = 1,
         UserType = 100

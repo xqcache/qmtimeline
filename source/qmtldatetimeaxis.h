@@ -26,6 +26,9 @@ public:
     qreal tickPixels() const;
     int visualTickCount() const;
 
+    void scaleUp();
+    void scaleDown();
+
     qreal mapToAxis(qint64 time_key) const;
     qreal mapToAxisX(qint64 time_key) const;
     // 当前光标所在的time_key

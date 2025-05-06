@@ -9,7 +9,7 @@
 struct QmTLGraphicsViewPrivate {
     QmTLDateTimeAxis* axis { nullptr };
 
-    QMetaObject::Connection scene_signal;
+    QList<QMetaObject::Connection> scene_signals;
 };
 
 QmTLGraphicsView::QmTLGraphicsView(QWidget* parent)
@@ -34,13 +34,21 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
     if (scene == this->scene()) {
         return;
     }
-    disconnect(d_->scene_signal);
+    for (const auto& conn : d_->scene_signals) {
+        disconnect(conn);
+    }
+    d_->scene_signals.clear();
     scene->setView(this);
     QGraphicsView::setScene(scene);
-    d_->scene_signal = connect(scene, &QmTLGraphicsScene::requestScaleAxis, this, [this, scene](bool zoom_in) {
-        d_->axis->setTickUnit(zoom_in ? d_->axis->tickUnit() + 100 : d_->axis->tickUnit() - 100);
-        scene->fitInAxis();
-    });
+    d_->scene_signals.append(connect(scene, &QmTLGraphicsScene::requestScaleAxis, this, [this, scene](bool zoom_in) {
+        if (zoom_in) {
+            d_->axis->scaleUp();
+        } else {
+            d_->axis->scaleDown();
+        }
+    }));
+    d_->scene_signals.append(
+        connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, [this, scene] { scene->fitInAxis(); }));
 }
 
 qreal QmTLGraphicsView::mapToAxisX(qint64 time_key) const
@@ -86,16 +94,19 @@ bool QmTLGraphicsView::event(QEvent* event)
     case QEvent::MouseButtonRelease:
     case QEvent::MouseButtonDblClick: {
         QMouseEvent* old_evt = static_cast<QMouseEvent*>(event);
-        QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
-            old_evt->button(), old_evt->buttons(), old_evt->modifiers(), old_evt->pointingDevice());
+        QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()),
+            old_evt->globalPosition(), old_evt->button(), old_evt->buttons(), old_evt->modifiers(),
+            old_evt->pointingDevice());
         qApp->sendEvent(viewport(), new_evt);
         return true;
     } break;
     case QEvent::Wheel: {
         QWheelEvent* old_evt = static_cast<QWheelEvent*>(event);
         if (old_evt->modifiers() == Qt::ControlModifier) {
-            QWheelEvent* new_evt = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(), old_evt->pixelDelta(), old_evt->angleDelta(),
-                old_evt->buttons(), old_evt->modifiers(), old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
+            QWheelEvent* new_evt
+                = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
+                    old_evt->pixelDelta(), old_evt->angleDelta(), old_evt->buttons(), old_evt->modifiers(),
+                    old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
             qApp->sendEvent(viewport(), new_evt);
             return true;
         }

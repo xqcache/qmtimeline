@@ -59,7 +59,7 @@ void QmTLGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent* event)
     scale_factor = qMax(d_->scale_factor_range.first, qMin(scale_factor, d_->scale_factor_range.second));
     if (!qFuzzyCompare(d_->scale_factor, scale_factor)) {
         d_->scale_factor = scale_factor;
-        emit requestScaleAxis(event->delta() < 0);
+        emit requestScaleAxis(event->delta() > 0);
     }
     event->accept();
 }

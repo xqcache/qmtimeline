@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
         if (auto* item_model = model->itemModel(item_id); item_model) {
             auto& item_data = static_cast<TLFrameItemData&>(item_model->data());
             item_data.setDelay(1000);
-            item_data.setTimeKey(3000);
+            item_data.setTimeKey(0);
             model->requestUpdate(item_id);
         }
     });

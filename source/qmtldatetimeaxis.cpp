@@ -107,6 +107,37 @@ int QmTLDateTimeAxis::visualTickCount() const
     return (width() - d_->cursor_size.width()) / d_->tick_pixels;
 }
 
+void QmTLDateTimeAxis::scaleUp()
+{
+    qint64 old_unit = d_->tick_unit;
+    qint64 old_max = visualTickCount() * old_unit;
+    qint64 new_max = visualTickCount() * (old_unit - 100);
+    qint64 new_visual_min = qMax(0, d_->tick_visual_min + (new_max - old_max));
+    if (new_visual_min == d_->tick_visual_min) {
+        return;
+    }
+    d_->tick_visual_min = new_visual_min;
+    setTickUnit(old_unit - 100);
+    emit scaleChanged();
+}
+
+void QmTLDateTimeAxis::scaleDown()
+{
+    qint64 old_unit = d_->tick_unit;
+    qint64 old_max = visualTickCount() * old_unit;
+    qint64 new_max = visualTickCount() * (old_unit + 100);
+    qint64 new_visual_min = qMax(0, d_->tick_visual_min + (new_max - old_max));
+    if (new_visual_min == d_->tick_visual_min) {
+        return;
+    }
+
+    auto old_tick_visual_min = d_->tick_visual_min;
+
+    d_->tick_visual_min = new_visual_min;
+    setTickUnit(old_unit + 100);
+    emit scaleChanged();
+}
+
 bool QmTLDateTimeAxis::event(QEvent* event)
 {
     switch (event->type()) {
@@ -264,7 +295,8 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         pen.setWidth(2);
         painter.setPen(pen);
 
-        QDateTime dt_start = QDateTime::fromMSecsSinceEpoch(d_->tick_min, QTimeZone::utc()).addMSecs(d_->tick_visual_min);
+        QDateTime dt_start
+            = QDateTime::fromMSecsSinceEpoch(d_->tick_min, QTimeZone::utc()).addMSecs(d_->tick_visual_min);
         int tick_count = visualTickCount();
         for (int i = 0; i < tick_count; ++i) {
             if (i % d_->tick_label_interval == 0) {
@@ -305,13 +337,15 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         painter.drawPath(cursorTailShape());
         painter.restore();
 
-        QString value_label = QDateTime::fromMSecsSinceEpoch(timeKey(), QTimeZone::utc()).toString(d_->tick_format);
-        qreal value_label_width = painter.fontMetrics().boundingRect(value_label).width();
+        QString value_str = QDateTime::fromMSecsSinceEpoch(timeKey(), QTimeZone::utc()).toString(d_->tick_format);
+        qreal value_str_width = painter.fontMetrics().boundingRect(value_str).width();
         painter.setPen(Qt::black);
-        if (d_->cursor_pos.x() + cursorWidth() + value_label_width > width()) {
-            painter.drawText(d_->cursor_pos.x() - value_label_width - 2, d_->cursor_pos.y() + painter.fontMetrics().height(), value_label);
+        if (d_->cursor_pos.x() + cursorWidth() + value_str_width > width()) {
+            painter.drawText(d_->cursor_pos.x() - value_str_width - 2,
+                d_->cursor_pos.y() + painter.fontMetrics().height(), value_str);
         } else {
-            painter.drawText(d_->cursor_pos.x() + cursorWidth() + 2, d_->cursor_pos.y() + painter.fontMetrics().height(), value_label);
+            painter.drawText(
+                d_->cursor_pos.x() + cursorWidth() + 2, d_->cursor_pos.y() + painter.fontMetrics().height(), value_str);
         }
     }
 }

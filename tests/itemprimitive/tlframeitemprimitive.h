@@ -18,6 +18,8 @@ public:
 private:
     void drawDelay(QPainter* painter);
 
+    QRectF calcBoundingRect() const;
+
 private:
     TLFrameItemPrimitivePrivate* d_ { nullptr };
 };

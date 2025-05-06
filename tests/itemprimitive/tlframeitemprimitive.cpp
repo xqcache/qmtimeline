@@ -19,17 +19,7 @@ TLFrameItemPrimitive::~TLFrameItemPrimitive() noexcept
 
 QRectF TLFrameItemPrimitive::boundingRect() const
 {
-    if (!graphModel()) [[unlikely]] {
-        return {};
-    }
-    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
-    if (!item_model) [[unlikely]] {
-        return {};
-    }
-    auto delay = item_model->data<TLFrameItemData>().delay();
-    qreal tick_pixels = graphScene().axisTickPixels();
-    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
-        graphScene().itemHeight(item_id_));
+    return calcBoundingRect();
 }
 
 void TLFrameItemPrimitive::fitInAxis()
@@ -41,7 +31,13 @@ void TLFrameItemPrimitive::fitInAxis()
     if (!item_model) [[unlikely]] {
         return;
     }
-    setX(graphScene().mapToAxisX(item_model->data().timeKey()));
+    qreal x = graphScene().mapToAxisX(item_model->data().timeKey());
+
+    if (!qFuzzyCompare(x, this->x())) {
+        setX(x);
+    } else if (item_model->data<TLFrameItemData>().hasDelay()) {
+        prepareGeometryChange();
+    }
 }
 
 void TLFrameItemPrimitive::drawDelay(QPainter* painter)
@@ -129,6 +125,21 @@ void TLFrameItemPrimitive::drawDelay(QPainter* painter)
         painter->drawPath(path);
         painter->restore();
     }
+}
+
+QRectF TLFrameItemPrimitive::calcBoundingRect() const
+{
+    if (!graphModel()) [[unlikely]] {
+        return {};
+    }
+    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
+    if (!item_model) [[unlikely]] {
+        return {};
+    }
+    auto delay = item_model->data<TLFrameItemData>().delay();
+    qreal tick_pixels = graphScene().axisTickPixels();
+    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
+        graphScene().itemHeight(item_id_));
 }
 
 void TLFrameItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

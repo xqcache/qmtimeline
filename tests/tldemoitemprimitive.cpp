@@ -1,33 +1,34 @@
-#include "tlframeitemprimitive.h"
-#include "itemmodel/tlframeitemmodel.h"
+#include "tldemoitemprimitive.h"
 #include "qmtlgraphicsmodel.h"
 #include "qmtlgraphicsscene.h"
+#include "tldemoitemmodel.h"
 #include <QPainter>
 
-struct TLFrameItemPrimitivePrivate { };
 
-TLFrameItemPrimitive::TLFrameItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene)
+struct TLDemoItemPrimitivePrivate { };
+
+TLDemoItemPrimitive::TLDemoItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene)
     : QmTLItemPrimitive(item_id, scene)
-    , d_(new TLFrameItemPrimitivePrivate)
+    , d_(new TLDemoItemPrimitivePrivate)
 {
 }
 
-TLFrameItemPrimitive::~TLFrameItemPrimitive() noexcept
+TLDemoItemPrimitive::~TLDemoItemPrimitive() noexcept
 {
     delete d_;
 }
 
-QRectF TLFrameItemPrimitive::boundingRect() const
+QRectF TLDemoItemPrimitive::boundingRect() const
 {
     return calcBoundingRect();
 }
 
-void TLFrameItemPrimitive::fitInAxis()
+void TLDemoItemPrimitive::fitInAxis()
 {
     if (!graphModel()) [[unlikely]] {
         return;
     }
-    auto* item_model = static_cast<TLFrameItemModel*>(graphModel()->itemModel(item_id_));
+    auto* item_model = static_cast<TLDemoItemModel*>(graphModel()->itemModel(item_id_));
     if (!item_model) [[unlikely]] {
         return;
     }
@@ -35,22 +36,22 @@ void TLFrameItemPrimitive::fitInAxis()
 
     if (!qFuzzyCompare(x, this->x())) {
         setX(x);
-    } else if (item_model->data<TLFrameItemData>().hasDelay()) {
+    } else if (item_model->data<TLDemoItemData>().hasDelay()) {
         prepareGeometryChange();
     }
 }
 
-void TLFrameItemPrimitive::drawDelay(QPainter* painter)
+void TLDemoItemPrimitive::drawDelay(QPainter* painter)
 {
     if (!graphModel()) [[unlikely]] {
         return;
     }
-    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
+    auto* item_model = graphModel()->itemModel<TLDemoItemModel>(item_id_);
     if (!item_model) [[unlikely]] {
         return;
     }
 
-    auto& item_data = item_model->data<TLFrameItemData>();
+    auto& item_data = item_model->data<TLDemoItemData>();
     const auto& delay = item_data.delay();
     if (!delay) {
         return;
@@ -127,22 +128,22 @@ void TLFrameItemPrimitive::drawDelay(QPainter* painter)
     }
 }
 
-QRectF TLFrameItemPrimitive::calcBoundingRect() const
+QRectF TLDemoItemPrimitive::calcBoundingRect() const
 {
     if (!graphModel()) [[unlikely]] {
         return {};
     }
-    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
+    auto* item_model = graphModel()->itemModel<TLDemoItemModel>(item_id_);
     if (!item_model) [[unlikely]] {
         return {};
     }
-    auto delay = item_model->data<TLFrameItemData>().delay();
+    auto delay = item_model->data<TLDemoItemData>().delay();
     qreal tick_pixels = graphScene().axisTickPixels();
     return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
         graphScene().itemHeight(item_id_));
 }
 
-void TLFrameItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void TLDemoItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->setPen(Qt::white);
     painter->setBrush(QColor("#006064"));

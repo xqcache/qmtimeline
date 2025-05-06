@@ -1,14 +1,15 @@
 #pragma once
 
-#include "itemdata/tlframeitemdata.h"
 #include "qmtlitemmodel.h"
+#include "tldemoitemdata.h"
 
-struct TLFrameItemModelPrivate;
-class TLFrameItemModel : public QmTLItemModel {
+
+struct TLDemoItemModelPrivate;
+class TLDemoItemModel : public QmTLItemModel {
     Q_OBJECT
 public:
-    explicit TLFrameItemModel(QObject* parent = nullptr);
-    ~TLFrameItemModel() noexcept override;
+    explicit TLDemoItemModel(QObject* parent = nullptr);
+    ~TLDemoItemModel() noexcept override;
 
 public:
     bool load(const nlohmann::json& json) override;
@@ -21,5 +22,5 @@ public:
     int type() const override;
 
 private:
-    TLFrameItemModelPrivate* d_ { nullptr };
+    TLDemoItemModelPrivate* d_ { nullptr };
 };

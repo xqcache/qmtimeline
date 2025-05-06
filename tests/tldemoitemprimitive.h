@@ -2,13 +2,13 @@
 
 #include "qmtlitemprimitive.h"
 
-struct TLFrameItemPrimitivePrivate;
+struct TLDemoItemPrimitivePrivate;
 
-class TLFrameItemPrimitive : public QmTLItemPrimitive {
+class TLDemoItemPrimitive : public QmTLItemPrimitive {
     Q_OBJECT
 public:
-    explicit TLFrameItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene);
-    ~TLFrameItemPrimitive() noexcept override;
+    explicit TLDemoItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene);
+    ~TLDemoItemPrimitive() noexcept override;
 
     QRectF boundingRect() const override;
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -21,5 +21,5 @@ private:
     QRectF calcBoundingRect() const;
 
 private:
-    TLFrameItemPrimitivePrivate* d_ { nullptr };
+    TLDemoItemPrimitivePrivate* d_ { nullptr };
 };

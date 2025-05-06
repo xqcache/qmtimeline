@@ -2,7 +2,7 @@
 
 #include "qmtlitemregistry.h"
 
-class TLItemRegistry : public QmTLItemRegistry {
+class TLDemoItemRegistry : public QmTLItemRegistry {
 public:
     std::unique_ptr<QmTLItemModel> createItemModel(int type) const override;
     std::unique_ptr<QmTLItemPrimitive> createItemPrimitive(

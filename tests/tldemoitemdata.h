@@ -2,9 +2,9 @@
 
 #include "qmtlitemdata.h"
 
-class TLFrameItemData : public QmTLItemData {
+class TLDemoItemData : public QmTLItemData {
 public:
-    ~TLFrameItemData() noexcept override;
+    ~TLDemoItemData() noexcept override;
 
     bool load(const nlohmann::json& json) override;
     nlohmann::json save() const override;

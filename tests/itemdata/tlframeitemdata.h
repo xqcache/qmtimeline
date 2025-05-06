@@ -1,10 +1,10 @@
 #pragma once
 
-#include "itemdata/qmtlitemdata.h"
+#include "qmtlitemdata.h"
 
-class QmTLFrameItemData : public QmTLItemData {
+class TLFrameItemData : public QmTLItemData {
 public:
-    ~QmTLFrameItemData() noexcept override;
+    ~TLFrameItemData() noexcept override;
 
     bool load(const nlohmann::json& json) override;
     nlohmann::json save() const override;

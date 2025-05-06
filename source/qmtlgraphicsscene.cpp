@@ -1,8 +1,8 @@
 #include "qmtlgraphicsscene.h"
-#include "graphicsitem/qmtlgraphicsframeitem.h"
-#include "itemmodel/qmtlitemmodel.h"
 #include "qmtlgraphicsmodel.h"
 #include "qmtlgraphicsview.h"
+#include "qmtlitemmodel.h"
+#include "qmtlitemregistry.h"
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
@@ -15,7 +15,7 @@ struct QmTLGraphicsScenePrivate {
     std::pair<qreal, qreal> scale_factor_range { 0.0, 30.0 };
     QmTLGraphicsModel* model { nullptr };
     QList<QMetaObject::Connection> model_signals;
-    std::map<QmTLItemID, std::unique_ptr<QmTLGraphicsItem>> items;
+    std::map<QmTLItemID, std::unique_ptr<QmTLItemPrimitive>> items;
 };
 
 QmTLGraphicsScene::QmTLGraphicsScene(QObject* parent)
@@ -103,11 +103,18 @@ qreal QmTLGraphicsScene::mapToAxis(qint64 time_key) const
 
 void QmTLGraphicsScene::onItemCreated(QmTLItemID item_id)
 {
+    if (!d_->model) {
+        return;
+    }
+    if (!d_->model->itemRegistry()) [[unlikely]] {
+        assert(0 && "Item registry is nullptr!");
+        return;
+    }
     auto* item_model = d_->model->itemModel(item_id);
     if (!item_model) {
         return;
     }
-    d_->items[item_id].reset(new QmTLGraphicsFrameItem(*this, item_id));
+    d_->items[item_id] = std::move(d_->model->itemRegistry()->createItemPrimitive(item_model->type(), item_id, *this));
 }
 
 void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles)
@@ -165,7 +172,7 @@ void QmTLGraphicsScene::updateItem(QmTLItemID item_id)
     }
 }
 
-QmTLGraphicsItem* QmTLGraphicsScene::graphItem(QmTLItemID item_id) const
+QmTLItemPrimitive* QmTLGraphicsScene::graphItem(QmTLItemID item_id) const
 {
     auto it = d_->items.find(item_id);
     if (it != d_->items.end()) {

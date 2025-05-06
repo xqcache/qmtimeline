@@ -21,7 +21,7 @@ class QmTLVideoItemModel;
 class QmTLAudioItemModel;
 
 // Item绘图，负责对应Item的绘制以及用户交互
-class QmTLGraphicsItem;
+class QmTLItemPrimitive;
 class QmTLGraphicsFrame;
 class QmTLGraphicsIO;
 class QmTLGraphicsVideo;

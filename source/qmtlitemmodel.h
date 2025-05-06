@@ -1,15 +1,16 @@
 #pragma once
 
-#include "itemdata/qmtlitemdata.h"
 #include "nlohmann/json.hpp"
+#include "qmtlitemdata.h"
 #include <QObject>
+
 
 struct QmTLItemModelPrivate;
 
 class QmTLItemModel : public QObject {
     Q_OBJECT
 public:
-    explicit QmTLItemModel(QObject* parent = nullptr);
+    explicit QmTLItemModel(std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);
     ~QmTLItemModel() noexcept override;
 
     virtual bool load(const nlohmann::json& json) = 0;
@@ -40,5 +41,5 @@ public:
     virtual int type() const = 0;
 
 protected:
-    virtual QmTLItemModelPrivate& d_ref() const = 0;
+    std::unique_ptr<QmTLItemData> data_;
 };

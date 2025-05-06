@@ -6,11 +6,14 @@
 class QmTLGraphicsModel;
 class QmTLGraphicsScene;
 
-class QmTLGraphicsItem : public QGraphicsObject {
+/**
+ * @brief Item图元
+ */
+class QmTLItemPrimitive : public QGraphicsObject {
     Q_OBJECT
 public:
-    explicit QmTLGraphicsItem(QmTLGraphicsScene& scene, QmTLItemID item_id);
-    virtual ~QmTLGraphicsItem() noexcept = default;
+    explicit QmTLItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene);
+    virtual ~QmTLItemPrimitive() noexcept = default;
 
     inline QmTLGraphicsScene& graphScene();
     inline const QmTLGraphicsScene& graphScene() const;
@@ -25,12 +28,12 @@ protected:
     QmTLItemID item_id_ { kQmTLInvalidItemID };
 };
 
-inline QmTLGraphicsScene& QmTLGraphicsItem::graphScene()
+inline QmTLGraphicsScene& QmTLItemPrimitive::graphScene()
 {
     return scene_;
 }
 
-inline const QmTLGraphicsScene& QmTLGraphicsItem::graphScene() const
+inline const QmTLGraphicsScene& QmTLItemPrimitive::graphScene() const
 {
     return scene_;
 }

@@ -5,7 +5,8 @@
 
 class QmTLGraphicsModel;
 class QmTLGraphicsView;
-class QmTLGraphicsItem;
+class QmTLItemPrimitive;
+class QmTLItemRegistry;
 
 struct QmTLGraphicsScenePrivate;
 
@@ -30,7 +31,7 @@ public:
 
     qreal itemHeight(QmTLItemID item_id) const;
     void updateItem(QmTLItemID item_id);
-    QmTLGraphicsItem* graphItem(QmTLItemID item_id) const;
+    QmTLItemPrimitive* graphItem(QmTLItemID item_id) const;
 
 signals:
     void requestScaleAxis(bool zoom_in);

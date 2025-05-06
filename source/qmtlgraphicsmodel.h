@@ -1,16 +1,18 @@
 #pragma once
 
-#include "itemmodel/qmtlitemmodel.h"
 #include "nlohmann/json.hpp"
+#include "qmtlitemmodel.h"
 #include "qmtltypedef.h"
 #include <QObject>
 #include <QVariant>
+
+class QmTLItemRegistry;
 
 struct QmTLGraphicsModelPrivate;
 class QmTLGraphicsModel : public QObject {
     Q_OBJECT
 public:
-    explicit QmTLGraphicsModel(QObject* parent = nullptr);
+    explicit QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_registry, QObject* parent = nullptr);
     ~QmTLGraphicsModel() noexcept override;
 
     bool load(const nlohmann::json& json);
@@ -29,10 +31,13 @@ public:
     void setItemData(QmTLItemID item_id, const QVariant& value, QmTLItemDataRole role);
     void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemDataRole::All);
 
+    QmTLItemRegistry* itemRegistry() const;
+
 signals:
-    void itemCreated(QmTLItemID item_id);
-    void itemRemoved(QmTLItemID item_id);
-    void itemChanged(QmTLItemID item_id, QmTLItemDataRoles roles);
+    // 标记为内部信号，外部无法使用model对象来发送
+    void itemCreated(QmTLItemID item_id, QPrivateSignal);
+    void itemRemoved(QmTLItemID item_id, QPrivateSignal);
+    void itemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, QPrivateSignal);
 
 private:
     QmTLGraphicsModelPrivate* d_ { nullptr };

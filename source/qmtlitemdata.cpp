@@ -1,4 +1,4 @@
-#include "itemdata/qmtlitemdata.h"
+#include "qmtlitemdata.h"
 
 void QmTLItemData::setTimeKey(qint64 time_key)
 {

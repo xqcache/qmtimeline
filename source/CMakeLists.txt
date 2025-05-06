@@ -11,6 +11,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_library(${TARGET_NAME} STATIC)
 target_link_libraries(${TARGET_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets nlohmann_json)
+target_include_directories(${TARGET_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
 
 set(PRIVATE_SOURCES
     qmtlgraphicsview.h
@@ -21,9 +22,12 @@ set(PRIVATE_SOURCES
     qmtlgraphicsmodel.cpp
     qmtldatetimeaxis.h
     qmtldatetimeaxis.cpp
+    qmtlitemregistry.h
+    qmtlitemdata.h
+    qmtlitemdata.cpp
+    qmtlitemmodel.h
+    qmtlitemmodel.cpp
+    qmtlitemprimitive.h
+    qmtlitemprimitive.cpp
 )
 target_sources(${TARGET_NAME} PRIVATE ${PRIVATE_SOURCES})
-
-add_subdirectory(graphicsitem)
-add_subdirectory(itemdata)
-add_subdirectory(itemmodel)

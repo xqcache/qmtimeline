@@ -1,60 +1,60 @@
-#include "qmtlgraphicsframeitem.h"
-#include "itemmodel/qmtlframeitemmodel.h"
+#include "tlframeitemprimitive.h"
+#include "itemmodel/tlframeitemmodel.h"
 #include "qmtlgraphicsmodel.h"
 #include "qmtlgraphicsscene.h"
 #include <QPainter>
 
-struct QmTLGraphicsFrameItemPrivate { };
+struct TLFrameItemPrimitivePrivate { };
 
-QmTLGraphicsFrameItem::QmTLGraphicsFrameItem(QmTLGraphicsScene& scene, QmTLItemID item_id)
-    : QmTLGraphicsItem(scene, item_id)
-    , d_(new QmTLGraphicsFrameItemPrivate)
+TLFrameItemPrimitive::TLFrameItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene)
+    : QmTLItemPrimitive(item_id, scene)
+    , d_(new TLFrameItemPrimitivePrivate)
 {
 }
 
-QmTLGraphicsFrameItem::~QmTLGraphicsFrameItem() noexcept
+TLFrameItemPrimitive::~TLFrameItemPrimitive() noexcept
 {
     delete d_;
 }
 
-QRectF QmTLGraphicsFrameItem::boundingRect() const
+QRectF TLFrameItemPrimitive::boundingRect() const
 {
     if (!graphModel()) [[unlikely]] {
         return {};
     }
-    auto* item_model = graphModel()->itemModel<QmTLFrameItemModel>(item_id_);
+    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
     if (!item_model) [[unlikely]] {
         return {};
     }
-    auto delay = item_model->data<QmTLFrameItemData>().delay();
+    auto delay = item_model->data<TLFrameItemData>().delay();
     qreal tick_pixels = graphScene().axisTickPixels();
     return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
         graphScene().itemHeight(item_id_));
 }
 
-void QmTLGraphicsFrameItem::fitInAxis()
+void TLFrameItemPrimitive::fitInAxis()
 {
     if (!graphModel()) [[unlikely]] {
         return;
     }
-    auto* item_model = static_cast<QmTLFrameItemModel*>(graphModel()->itemModel(item_id_));
+    auto* item_model = static_cast<TLFrameItemModel*>(graphModel()->itemModel(item_id_));
     if (!item_model) [[unlikely]] {
         return;
     }
     setX(graphScene().mapToAxisX(item_model->data().timeKey()));
 }
 
-void QmTLGraphicsFrameItem::drawDelay(QPainter* painter)
+void TLFrameItemPrimitive::drawDelay(QPainter* painter)
 {
     if (!graphModel()) [[unlikely]] {
         return;
     }
-    auto* item_model = graphModel()->itemModel<QmTLFrameItemModel>(item_id_);
+    auto* item_model = graphModel()->itemModel<TLFrameItemModel>(item_id_);
     if (!item_model) [[unlikely]] {
         return;
     }
 
-    auto& item_data = item_model->data<QmTLFrameItemData>();
+    auto& item_data = item_model->data<TLFrameItemData>();
     const auto& delay = item_data.delay();
     if (!delay) {
         return;
@@ -131,7 +131,7 @@ void QmTLGraphicsFrameItem::drawDelay(QPainter* painter)
     }
 }
 
-void QmTLGraphicsFrameItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void TLFrameItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     painter->setPen(Qt::white);
     painter->setBrush(QColor("#006064"));

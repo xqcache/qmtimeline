@@ -38,3 +38,7 @@ set(PRIVATE_SOURCES
     qmtlitemprimitive.cpp
 )
 target_sources(${TARGET_NAME} PRIVATE ${PRIVATE_SOURCES})
+
+if(QMTIMELINE_INSTALL)
+    install(TARGETS ${TARGET_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()

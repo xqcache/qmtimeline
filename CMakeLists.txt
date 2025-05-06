@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(QMTIMELINE_JSON_EXTERNAL "Use external nlohmann_json" OFF)
 option(QMTIMELINE_BUILD_TESTS "Building test" OFF)
 option(QMTIMELINE_BUILD_SHARED_LIBS "" ON)
+option(QMTIMELINE_INSTALL "" ON)
 
 add_subdirectory(depends)
 add_subdirectory(source)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qmtimeline_global.h"
 #include "qmtltypedef.h"
 #include <QGraphicsObject>
 
@@ -9,7 +10,7 @@ class QmTLGraphicsScene;
 /**
  * @brief Item图元
  */
-class QmTLItemPrimitive : public QGraphicsObject {
+class QMTIMELINE_EXPORT QmTLItemPrimitive : public QGraphicsObject {
     Q_OBJECT
 public:
     explicit QmTLItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene);

@@ -1,11 +1,12 @@
 #pragma once
 
+#include "qmtimeline_global.h"
 #include <QDateTime>
 #include <QWidget>
 
 struct QmTLDateTimeAxisPrivate;
 
-class QmTLDateTimeAxis : public QWidget {
+class QMTIMELINE_EXPORT QmTLDateTimeAxis : public QWidget {
     Q_OBJECT
 public:
     explicit QmTLDateTimeAxis(QWidget* parent = nullptr);

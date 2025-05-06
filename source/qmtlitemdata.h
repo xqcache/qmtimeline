@@ -1,9 +1,10 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
+#include "qmtimeline_global.h"
 #include <qtypes.h>
 
-class QmTLItemData {
+class QMTIMELINE_EXPORT QmTLItemData {
 public:
     virtual ~QmTLItemData() noexcept = default;
 

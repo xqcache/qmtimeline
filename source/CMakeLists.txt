@@ -9,7 +9,14 @@ set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_library(${TARGET_NAME} STATIC)
+if(QMTIMELINE_BUILD_SHARED_LIBS OR BUILD_SHARED_LIBS)
+    add_library(${TARGET_NAME} SHARED)
+    target_compile_definitions(${TARGET_NAME} PRIVATE QMTIMELINE_COMPILE_LIB)
+else()
+    add_library(${TARGET_NAME} STATIC)
+    target_compile_definitions(${TARGET_NAME} PUBLIC QMTIMELINE_BUILD_STATIC)
+endif()
+
 target_link_libraries(${TARGET_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets nlohmann_json)
 target_include_directories(${TARGET_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
 

@@ -1,13 +1,13 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
+#include "qmtimeline_global.h"
 #include "qmtlitemdata.h"
 #include <QObject>
 
-
 struct QmTLItemModelPrivate;
 
-class QmTLItemModel : public QObject {
+class QMTIMELINE_EXPORT QmTLItemModel : public QObject {
     Q_OBJECT
 public:
     explicit QmTLItemModel(std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);

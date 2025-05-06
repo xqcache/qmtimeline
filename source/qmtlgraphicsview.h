@@ -1,12 +1,13 @@
 #pragma once
 
+#include "qmtimeline_global.h"
 #include <QGraphicsView>
 
 class QmTLGraphicsScene;
 
 struct QmTLGraphicsViewPrivate;
 
-class QmTLGraphicsView : public QGraphicsView {
+class QMTIMELINE_EXPORT QmTLGraphicsView : public QGraphicsView {
     Q_OBJECT
 
 public:

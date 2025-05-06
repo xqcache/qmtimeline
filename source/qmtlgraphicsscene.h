@@ -1,5 +1,6 @@
 #pragma once
 
+#include "qmtimeline_global.h"
 #include "qmtltypedef.h"
 #include <QGraphicsScene>
 
@@ -10,7 +11,7 @@ class QmTLItemRegistry;
 
 struct QmTLGraphicsScenePrivate;
 
-class QmTLGraphicsScene : public QGraphicsScene {
+class QMTIMELINE_EXPORT QmTLGraphicsScene : public QGraphicsScene {
     Q_OBJECT
 public:
     explicit QmTLGraphicsScene(QObject* parent = nullptr);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nlohmann/json.hpp"
+#include "qmtimeline_global.h"
 #include "qmtlitemmodel.h"
 #include "qmtltypedef.h"
 #include <QObject>
@@ -9,7 +10,7 @@
 class QmTLItemRegistry;
 
 struct QmTLGraphicsModelPrivate;
-class QmTLGraphicsModel : public QObject {
+class QMTIMELINE_EXPORT QmTLGraphicsModel : public QObject {
     Q_OBJECT
 public:
     explicit QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_registry, QObject* parent = nullptr);

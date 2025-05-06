@@ -1,11 +1,12 @@
 #pragma once
 
+#include "qmtimeline_global.h"
 #include "qmtlitemmodel.h"
 #include "qmtlitemprimitive.h"
 
 class QmTLGraphicsScene;
 
-class QmTLItemRegistry {
+class QMTIMELINE_EXPORT QmTLItemRegistry {
 public:
     virtual ~QmTLItemRegistry() noexcept = default;
 

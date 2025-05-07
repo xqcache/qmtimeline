@@ -30,7 +30,6 @@ public:
 
     void fitInAxis();
 
-    qreal itemHeight(QmTLItemID item_id) const;
     void updateItem(QmTLItemID item_id);
     QmTLItemPrimitive* graphItem(QmTLItemID item_id) const;
 

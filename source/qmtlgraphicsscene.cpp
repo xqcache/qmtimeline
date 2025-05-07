@@ -76,11 +76,9 @@ void QmTLGraphicsScene::setModel(QmTLGraphicsModel* model)
     d_->model_signals.clear();
     d_->model = model;
 
-    d_->model_signals.append(
-        connect(d_->model, &QmTLGraphicsModel::itemCreated, this, &QmTLGraphicsScene::onItemCreated));
+    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemCreated, this, &QmTLGraphicsScene::onItemCreated));
 
-    d_->model_signals.append(
-        connect(d_->model, &QmTLGraphicsModel::itemChanged, this, &QmTLGraphicsScene::onItemChanged));
+    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemChanged, this, &QmTLGraphicsScene::onItemChanged));
 }
 
 QmTLGraphicsModel* QmTLGraphicsScene::model() const
@@ -158,11 +156,6 @@ void QmTLGraphicsScene::fitInAxis()
     }
 }
 
-qreal QmTLGraphicsScene::itemHeight(QmTLItemID item_id) const
-{
-    // TODO: 待实现
-    return 100;
-}
 
 void QmTLGraphicsScene::updateItem(QmTLItemID item_id)
 {

@@ -10,6 +10,11 @@ QmTLItemModel::~QmTLItemModel() noexcept
 {
 }
 
+qreal QmTLItemModel::height() const
+{
+    return 10;
+}
+
 QmTLItemData& QmTLItemModel::data()
 {
     if (!data_) {

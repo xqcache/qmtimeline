@@ -16,6 +16,8 @@ public:
     virtual bool load(const nlohmann::json& json) = 0;
     virtual nlohmann::json save() const = 0;
 
+    virtual qreal height() const;
+
     virtual QmTLItemData& data();
     virtual const QmTLItemData& data() const;
 

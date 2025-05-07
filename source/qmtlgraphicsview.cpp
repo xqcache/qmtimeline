@@ -47,8 +47,7 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
             d_->axis->scaleDown();
         }
     }));
-    d_->scene_signals.append(
-        connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, [this, scene] { scene->fitInAxis(); }));
+    d_->scene_signals.append(connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, [this, scene] { scene->fitInAxis(); }));
 }
 
 qreal QmTLGraphicsView::mapToAxisX(qint64 time_key) const
@@ -94,9 +93,8 @@ bool QmTLGraphicsView::event(QEvent* event)
     case QEvent::MouseButtonRelease:
     case QEvent::MouseButtonDblClick: {
         QMouseEvent* old_evt = static_cast<QMouseEvent*>(event);
-        QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()),
-            old_evt->globalPosition(), old_evt->button(), old_evt->buttons(), old_evt->modifiers(),
-            old_evt->pointingDevice());
+        QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
+            old_evt->button(), old_evt->buttons(), old_evt->modifiers(), old_evt->pointingDevice());
         qApp->sendEvent(viewport(), new_evt);
         return true;
     } break;
@@ -104,9 +102,8 @@ bool QmTLGraphicsView::event(QEvent* event)
         QWheelEvent* old_evt = static_cast<QWheelEvent*>(event);
         if (old_evt->modifiers() == Qt::ControlModifier) {
             QWheelEvent* new_evt
-                = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
-                    old_evt->pixelDelta(), old_evt->angleDelta(), old_evt->buttons(), old_evt->modifiers(),
-                    old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
+                = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(), old_evt->pixelDelta(), old_evt->angleDelta(),
+                    old_evt->buttons(), old_evt->modifiers(), old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
             qApp->sendEvent(viewport(), new_evt);
             return true;
         }

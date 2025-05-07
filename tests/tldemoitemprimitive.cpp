@@ -4,7 +4,6 @@
 #include "tldemoitemmodel.h"
 #include <QPainter>
 
-
 struct TLDemoItemPrimitivePrivate { };
 
 TLDemoItemPrimitive::TLDemoItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scene)
@@ -139,8 +138,7 @@ QRectF TLDemoItemPrimitive::calcBoundingRect() const
     }
     auto delay = item_model->data<TLDemoItemData>().delay();
     qreal tick_pixels = graphScene().axisTickPixels();
-    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
-        graphScene().itemHeight(item_id_));
+    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels, item_model->height());
 }
 
 void TLDemoItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

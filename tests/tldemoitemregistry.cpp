@@ -13,8 +13,7 @@ std::unique_ptr<QmTLItemModel> TLDemoItemRegistry::createItemModel(int type) con
     return nullptr;
 }
 
-std::unique_ptr<QmTLItemPrimitive> TLDemoItemRegistry::createItemPrimitive(
-    int type, QmTLItemID item_id, QmTLGraphicsScene& scene) const
+std::unique_ptr<QmTLItemPrimitive> TLDemoItemRegistry::createItemPrimitive(int type, QmTLItemID item_id, QmTLGraphicsScene& scene) const
 {
     switch (type) {
     case TLDemoItemModel::Type:

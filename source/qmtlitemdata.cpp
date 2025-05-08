@@ -13,7 +13,7 @@ qint64 QmTLItemData::timeKey() const
 
 bool QmTLItemData::setData(const QVariant& data, int role)
 {
-    if (role == QmTLItemDataRole::TimeKey) {
+    if (role == QmTLItemData::TimeKeyRole) {
         setTimeKey(data.value<qint64>());
         return true;
     }

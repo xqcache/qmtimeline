@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmtimeline_global.h"
+#include "qmtlitemdata.h"
 #include "qmtltypedef.h"
 #include <QGraphicsScene>
 

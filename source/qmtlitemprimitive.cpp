@@ -17,7 +17,7 @@ QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const
 
 bool QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles)
 {
-    if (roles.testFlag(QmTLItemDataRole::TimeKey)) {
+    if (roles.testFlag(QmTLItemData::TimeKeyRole)) {
         auto* item_model = graphModel()->itemModel(item_id_);
         if (!item_model) {
             return false;

@@ -8,7 +8,6 @@
 
 struct QmTLGraphicsViewPrivate {
     QmTLDateTimeAxis* axis { nullptr };
-
     QList<QMetaObject::Connection> scene_signals;
 };
 
@@ -63,6 +62,11 @@ qreal QmTLGraphicsView::mapToAxis(qint64 time_key) const
 qreal QmTLGraphicsView::axisTickPixels() const
 {
     return d_->axis->tickPixels();
+}
+
+qint64 QmTLGraphicsView::axisTimeKey() const
+{
+    return d_->axis->timeKey();
 }
 
 void QmTLGraphicsView::initUi()

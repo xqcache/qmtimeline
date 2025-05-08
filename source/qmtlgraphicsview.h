@@ -17,6 +17,7 @@ public:
     qreal mapToAxisX(qint64 time_key) const;
     qreal mapToAxis(qint64 time_key) const;
     qreal axisTickPixels() const;
+    qint64 axisTimeKey() const;
 
     void setScene(QmTLGraphicsScene* scene);
 

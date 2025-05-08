@@ -36,7 +36,7 @@ public:
     void endBatchModify(QmTLItemID item_id);
 
     void setItemData(QmTLItemID item_id, const QVariant& value, int role);
-    void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemDataRole::All);
+    void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemData::AllRole);
 
     QmTLItemRegistry* itemRegistry() const;
 

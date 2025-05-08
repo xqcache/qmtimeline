@@ -86,7 +86,7 @@ void QmTLGraphicsModel::setItemData(QmTLItemID item_id, const QVariant& data, in
     }
     item_model->data().setData(data, role);
     if (isItemBatchModified(item_id)) {
-        d_->item_modifies[item_id].setFlag(static_cast<QmTLItemDataRole::Role>(role));
+        d_->item_modifies[item_id].setFlag(role);
     } else {
         requestUpdate(item_id);
     }
@@ -99,13 +99,13 @@ void QmTLGraphicsModel::requestUpdate(QmTLItemID item_id, QmTLItemDataRoles role
 
 void QmTLGraphicsModel::beginBatchModify(QmTLItemID item_id)
 {
-    d_->item_modifies[item_id] = QmTLItemDataRole::None;
+    d_->item_modifies[item_id] = QmTLItemData::NoneRole;
 }
 
 void QmTLGraphicsModel::endBatchModify(QmTLItemID item_id)
 {
     auto it = d_->item_modifies.find(item_id);
-    if (it != d_->item_modifies.end() && it->second != QmTLItemDataRole::None) {
+    if (it != d_->item_modifies.end() && it->second != QmTLItemData::NoneRole) {
         requestUpdate(item_id, it->second);
         d_->item_modifies.erase(it);
     }

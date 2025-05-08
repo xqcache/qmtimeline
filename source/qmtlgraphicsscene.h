@@ -43,6 +43,7 @@ protected:
 
 private slots:
     void onItemCreated(QmTLItemID item_id);
+    void onItemAboutToBeRemoved(QmTLItemID item_id);
     void onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles);
 
 private:

@@ -22,8 +22,6 @@ QmTLGraphicsScene::QmTLGraphicsScene(QObject* parent)
     : QGraphicsScene(parent)
     , d_(new QmTLGraphicsScenePrivate)
 {
-    // TODO: 后期需要根据Axis Timekey的最大值来确定宽度
-    setSceneRect(0, 0, 20000, 20000);
 }
 
 QmTLGraphicsScene::~QmTLGraphicsScene() noexcept
@@ -33,6 +31,8 @@ QmTLGraphicsScene::~QmTLGraphicsScene() noexcept
 
 void QmTLGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
+    clearSelection();
+
     QGraphicsScene::mousePressEvent(event);
     if (!event->isAccepted()) {
         event->accept();
@@ -75,10 +75,11 @@ void QmTLGraphicsScene::setModel(QmTLGraphicsModel* model)
     }
     d_->model_signals.clear();
     d_->model = model;
+    d_->items.clear();
 
     d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemCreated, this, &QmTLGraphicsScene::onItemCreated));
-
     d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemChanged, this, &QmTLGraphicsScene::onItemChanged));
+    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemAboutToBeRemoved, this, &QmTLGraphicsScene::onItemAboutToBeRemoved));
 }
 
 QmTLGraphicsModel* QmTLGraphicsScene::model() const
@@ -115,15 +116,20 @@ void QmTLGraphicsScene::onItemCreated(QmTLItemID item_id)
     d_->items[item_id] = std::move(d_->model->itemRegistry()->createItemPrimitive(item_model->type(), item_id, *this));
 }
 
+void QmTLGraphicsScene::onItemAboutToBeRemoved(QmTLItemID item_id)
+{
+    auto it = d_->items.find(item_id);
+    if (it == d_->items.end()) {
+        return;
+    }
+    removeItem(it->second.get());
+    d_->items.erase(it);
+}
+
 void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles)
 {
-    auto* item = graphItem(item_id);
-    if (roles.testFlag(QmTLItemDataRole::TimeKey)) {
-        auto* item_model = d_->model->itemModel(item_id);
-        if (!item_model) {
-            return;
-        }
-        item->setPos(mapToAxisX(item_model->data().timeKey()), 10);
+    if (auto* item = graphItem(item_id); item) {
+        item->onDataChanged(roles);
     }
 }
 
@@ -155,7 +161,6 @@ void QmTLGraphicsScene::fitInAxis()
         item->fitInAxis();
     }
 }
-
 
 void QmTLGraphicsScene::updateItem(QmTLItemID item_id)
 {

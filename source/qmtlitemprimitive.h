@@ -24,6 +24,9 @@ public:
 protected:
     QmTLGraphicsModel* graphModel() const;
 
+    friend class QmTLGraphicsScene;
+    virtual bool onDataChanged(QmTLItemDataRoles roles);
+
 protected:
     QmTLGraphicsScene& scene_;
     QmTLItemID item_id_ { kQmTLInvalidItemID };

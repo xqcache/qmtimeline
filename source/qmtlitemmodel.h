@@ -4,6 +4,7 @@
 #include "qmtimeline_global.h"
 #include "qmtlitemdata.h"
 #include <QObject>
+#include <QVariant>
 
 struct QmTLItemModelPrivate;
 
@@ -36,8 +37,8 @@ public:
     }
 
     enum {
-        Type = 1,
-        UserType = 100
+        Type = 0,
+        UserType = 10
     };
 
     virtual int type() const = 0;

@@ -2,7 +2,7 @@
 
 #include "nlohmann/json.hpp"
 #include "qmtimeline_global.h"
-#include <qtypes.h>
+#include <QVariant>
 
 class QMTIMELINE_EXPORT QmTLItemData {
 public:
@@ -13,6 +13,8 @@ public:
 
     void setTimeKey(qint64 time_key);
     qint64 timeKey() const;
+
+    virtual bool setData(const QVariant& data, int role);
 
 protected:
     qint64 time_key_ { 10 };

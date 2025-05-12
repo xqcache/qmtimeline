@@ -1,21 +1,50 @@
 #include "qmtlitemdata.h"
 #include "qmtltypedef.h"
 
-void QmTLItemData::setTimeKey(qint64 time_key)
+void QmTLItemData::setOrigin(qint64 origin)
 {
-    time_key_ = time_key;
+    origin_ = origin;
 }
 
-qint64 QmTLItemData::timeKey() const
+qint64 QmTLItemData::origin() const
 {
-    return time_key_;
+    return origin_;
 }
 
-bool QmTLItemData::setData(const QVariant& data, int role)
+void QmTLItemData::setDuration(qint64 duration)
 {
-    if (role == QmTLItemData::TimeKeyRole) {
-        setTimeKey(data.value<qint64>());
+    duration_ = duration;
+}
+
+qint64 QmTLItemData::duration() const
+{
+    return duration_;
+}
+
+bool QmTLItemData::setProperty(const QVariant& value, int role)
+{
+    switch (role) {
+    case OriginRole:
+        setOrigin(value.value<qint64>());
         return true;
+    case DurationRole:
+        setDuration(value.value<qint64>());
+        return true;
+    default:
+        break;
     }
     return false;
+}
+
+std::optional<QVariant> QmTLItemData::property(int role) const
+{
+    switch (role) {
+    case OriginRole:
+        return QVariant::fromValue<qint64>(origin_);
+    case DurationRole:
+        return QVariant::fromValue<qint64>(duration_);
+    default:
+        break;
+    }
+    return std::nullopt;
 }

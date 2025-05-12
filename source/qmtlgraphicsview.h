@@ -19,6 +19,8 @@ public:
     qreal axisTickPixels() const;
     qint64 axisTimeKey() const;
 
+    void setAxisTickPixels(qreal tick_pixels);
+
     void setScene(QmTLGraphicsScene* scene);
 
 protected:

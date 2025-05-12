@@ -69,6 +69,11 @@ qint64 QmTLGraphicsView::axisTimeKey() const
     return d_->axis->timeKey();
 }
 
+void QmTLGraphicsView::setAxisTickPixels(qreal tick_pixels)
+{
+    d_->axis->setTickPixels(tick_pixels);
+}
+
 void QmTLGraphicsView::initUi()
 {
     setDragMode(QGraphicsView::ScrollHandDrag);

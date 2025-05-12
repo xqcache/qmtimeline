@@ -35,8 +35,9 @@ public:
     void beginBatchModify(QmTLItemID item_id);
     void endBatchModify(QmTLItemID item_id);
 
-    void setItemData(QmTLItemID item_id, const QVariant& value, int role);
-    void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemData::AllRole);
+    std::optional<QVariant> itemProperty(QmTLItemID item_id, int role) const;
+    void setItemProperty(QmTLItemID item_id, const QVariant& value, int role);
+    void requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles = QmTLItemData::AllRole, const QVariant& param = QVariant());
 
     QmTLItemRegistry* itemRegistry() const;
 
@@ -45,7 +46,7 @@ signals:
     void itemCreated(QmTLItemID item_id, QPrivateSignal);
     void itemRemoved(QmTLItemID item_id, QPrivateSignal);
     void itemAboutToBeRemoved(QmTLItemID item_id, QPrivateSignal);
-    void itemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, QPrivateSignal);
+    void itemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param, QPrivateSignal);
 
 protected:
     virtual QmTLItemID createItemId(QmTLItemID index, const void* arg = nullptr) const;

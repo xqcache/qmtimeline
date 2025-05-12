@@ -126,10 +126,10 @@ void QmTLGraphicsScene::onItemAboutToBeRemoved(QmTLItemID item_id)
     d_->items.erase(it);
 }
 
-void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles)
+void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
 {
     if (auto* item = graphItem(item_id); item) {
-        item->onDataChanged(roles);
+        item->onDataChanged(roles, param);
     }
 }
 

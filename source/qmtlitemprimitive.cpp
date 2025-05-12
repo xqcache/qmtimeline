@@ -15,20 +15,18 @@ QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const
     return scene_.model();
 }
 
-bool QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles)
+void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles, const QVariant& param)
 {
-    if (roles.testFlag(QmTLItemData::TimeKeyRole)) {
+    if (roles.testFlag(QmTLItemData::OriginRole)) {
         auto* item_model = graphModel()->itemModel(item_id_);
         if (!item_model) {
-            return false;
+            return;
         }
-        auto new_x = scene_.mapToAxisX(item_model->data().timeKey());
+        auto new_x = scene_.mapToAxisX(item_model->data().origin());
         if (!qFuzzyCompare(new_x, x())) {
             setX(new_x);
         }
-        return true;
     }
-    return false;
 }
 
 void QmTLItemPrimitive::fitInAxis()

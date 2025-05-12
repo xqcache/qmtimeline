@@ -78,13 +78,13 @@ QmTLItemID QmTLGraphicsModel::createItem(int type, const void* arg)
     return item_id;
 }
 
-void QmTLGraphicsModel::setItemData(QmTLItemID item_id, const QVariant& data, int role)
+void QmTLGraphicsModel::setItemProperty(QmTLItemID item_id, const QVariant& data, int role)
 {
     auto* item_model = itemModel(item_id);
     if (!item_model) {
         return;
     }
-    item_model->data().setData(data, role);
+    item_model->data().setProperty(data, role);
     if (isItemBatchModified(item_id)) {
         d_->item_modifies[item_id].setFlag(role);
     } else {
@@ -92,9 +92,18 @@ void QmTLGraphicsModel::setItemData(QmTLItemID item_id, const QVariant& data, in
     }
 }
 
-void QmTLGraphicsModel::requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles)
+std::optional<QVariant> QmTLGraphicsModel::itemProperty(QmTLItemID item_id, int role) const
 {
-    emit itemChanged(item_id, roles, QPrivateSignal());
+    auto* item_model = itemModel(item_id);
+    if (!item_model) {
+        return std::nullopt;
+    }
+    return item_model->data().property(role);
+}
+
+void QmTLGraphicsModel::requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
+{
+    emit itemChanged(item_id, roles, param, QPrivateSignal());
 }
 
 void QmTLGraphicsModel::beginBatchModify(QmTLItemID item_id)

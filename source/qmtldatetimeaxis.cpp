@@ -248,7 +248,7 @@ QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
     auto cursor_width = cursorWidth() * 0.8;
     auto cursor_height = cursorHeight();
     qreal top_margin = cursor_height * 0.2;
-    qreal left_margin = (cursorWidth() - cursor_width) / 2;
+    qreal left_margin = (qMax(d_->tick_pixels, cursorWidth()) - cursor_width) / 2;
     shape.moveTo(left_margin, top_margin);
     shape.lineTo(left_margin, cursor_height * 0.8);
     shape.lineTo(left_margin + cursor_width / 2, cursor_height);
@@ -262,8 +262,9 @@ QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
 QPainterPath QmTLDateTimeAxis::cursorTailShape() const
 {
     QPainterPath shape;
-    shape.moveTo(cursorWidth() / 2, cursorHeight());
-    shape.lineTo(cursorWidth() / 2, height());
+    qreal left_margin = qMax(d_->tick_pixels, cursorWidth()) / 2;
+    shape.moveTo(left_margin, cursorHeight());
+    shape.lineTo(left_margin, height());
     shape.translate(d_->cursor_pos);
     return shape;
 }
@@ -299,7 +300,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         int tick_count = visualTickCount();
         for (int i = 0; i < tick_count; ++i) {
             if (i % d_->tick_label_interval == 0) {
-                qreal x = i * d_->tick_pixels + d_->cursor_size.width() / 2;
+                qreal x = i * d_->tick_pixels + qMax(d_->tick_pixels / 2.0, d_->cursor_size.width() / 2);
                 painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, d_->cursor_size.height() * 0.9));
                 // {
                 //     painter.save();
@@ -354,5 +355,5 @@ qreal QmTLDateTimeAxis::mapToAxis(qint64 time_key) const
 
 qreal QmTLDateTimeAxis::mapToAxisX(qint64 time_key) const
 {
-    return mapToAxis(time_key) + d_->cursor_size.width() / 2;
+    return mapToAxis(time_key) + qMax(d_->tick_pixels / 2.0, d_->cursor_size.width() / 2);
 }

@@ -11,6 +11,11 @@ qint64 QmTLItemData::origin() const
     return origin_;
 }
 
+qint64 QmTLItemData::destination() const
+{
+    return origin_ + duration_;
+}
+
 void QmTLItemData::setDuration(qint64 duration)
 {
     duration_ = duration;

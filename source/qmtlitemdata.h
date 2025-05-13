@@ -25,6 +25,7 @@ public:
 
     void setOrigin(qint64 origin);
     qint64 origin() const;
+    qint64 destination() const;
 
     void setDuration(qint64 duration);
     qint64 duration() const;

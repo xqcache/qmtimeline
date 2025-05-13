@@ -18,7 +18,7 @@ public:
     explicit QmTLGraphicsScene(QObject* parent = nullptr);
     ~QmTLGraphicsScene() noexcept override;
 
-    void setModel(QmTLGraphicsModel* model);
+    virtual void setModel(QmTLGraphicsModel* model);
     QmTLGraphicsModel* model() const;
 
     void setView(QmTLGraphicsView* view);

@@ -7,6 +7,7 @@ QmTLItemPrimitive::QmTLItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scen
     , item_id_(item_id)
 {
     scene.addItem(this);
+    setZValue(0);
     setY(10);
 }
 

@@ -18,6 +18,8 @@ public:
     explicit QmTLGraphicsScene(QObject* parent = nullptr);
     ~QmTLGraphicsScene() noexcept override;
 
+    virtual void fitInAxis();
+
     virtual void setModel(QmTLGraphicsModel* model);
     QmTLGraphicsModel* model() const;
 
@@ -28,8 +30,6 @@ public:
     qreal axisTickPixels() const;
 
     void setScaleFactorRange(qreal min, qreal max);
-
-    void fitInAxis();
 
     void updateItem(QmTLItemID item_id);
     QmTLItemPrimitive* graphItem(QmTLItemID item_id) const;

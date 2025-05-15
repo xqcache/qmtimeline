@@ -88,7 +88,7 @@ void QmTLGraphicsModel::setItemProperty(QmTLItemID item_id, const QVariant& data
     if (isItemBatchModified(item_id)) {
         d_->item_modifies[item_id].setFlag(role);
     } else {
-        requestUpdate(item_id);
+        requestUpdate(item_id, role);
     }
 }
 

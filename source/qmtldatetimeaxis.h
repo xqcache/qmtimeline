@@ -13,9 +13,9 @@ public:
     ~QmTLDateTimeAxis() noexcept override;
 
     void setFormat(const QString& format = "HH:mm:ss");
-    void setRange(const QDateTime& min, const QDateTime& max);
-    void setMin(const QDateTime& min);
-    void setMax(const QDateTime& max);
+    void setRange(qint64 min, qint64 max);
+    void setMin(qint64 min);
+    void setMax(qint64 max);
     void setTickPixels(qreal tick_pixels);
     void setTickUnit(qint64 tick_unit);
     void setTickLabelInterval(int tick_label_interval);
@@ -26,6 +26,8 @@ public:
     qint64 tickUnit() const;
     qreal tickPixels() const;
     int visualTickCount() const;
+    // 最大和最小间隔
+    qint64 rangeInterval() const;
 
     void scaleUp();
     void scaleDown();
@@ -33,11 +35,12 @@ public:
     qreal mapToAxis(qint64 time_key) const;
     qreal mapToAxisX(qint64 time_key) const;
     // 当前光标所在的time_key
-    qint64 timeKey() const;
+    qint64 value() const;
 
 signals:
     void tickUnitChanged(qint64 tick_unit);
-    void visualChanged(qint64 visual_min);
+    void rangeChanged(qint64 min, qint64 max);
+    void visualRangeChanged(qint64 visual_min);
     void scaleChanged();
 
 protected:

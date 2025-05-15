@@ -39,6 +39,8 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
     d_->scene_signals.clear();
     scene->setView(this);
     QGraphicsView::setScene(scene);
+    setSceneRect(0, 0, mapToAxis(axisRangeInterval()), 20000);
+
     d_->scene_signals.append(connect(scene, &QmTLGraphicsScene::requestScaleAxis, this, [this, scene](bool zoom_in) {
         if (zoom_in) {
             d_->axis->scaleUp();
@@ -47,6 +49,11 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
         }
     }));
     d_->scene_signals.append(connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, [this, scene] { scene->fitInAxis(); }));
+    d_->scene_signals.append(connect(d_->axis, &QmTLDateTimeAxis::rangeChanged, this, [this, scene](qint64 min, qint64 max) {
+        auto rect = sceneRect();
+        rect.setWidth(scene->mapToAxis(max - min));
+        setSceneRect(rect);
+    }));
 }
 
 qreal QmTLGraphicsView::mapToAxisX(qint64 time_key) const
@@ -64,9 +71,19 @@ qreal QmTLGraphicsView::axisTickPixels() const
     return d_->axis->tickPixels();
 }
 
-qint64 QmTLGraphicsView::axisTimeKey() const
+qint64 QmTLGraphicsView::axisTickValue() const
 {
-    return d_->axis->timeKey();
+    return d_->axis->value();
+}
+
+qint64 QmTLGraphicsView::axisRangeInterval() const
+{
+    return d_->axis->rangeInterval();
+}
+
+void QmTLGraphicsView::setAxisRange(qint64 min, qint64 max)
+{
+    d_->axis->setRange(min, max);
 }
 
 void QmTLGraphicsView::setAxisTickPixels(qreal tick_pixels)
@@ -93,6 +110,7 @@ void QmTLGraphicsView::initUi()
 
 void QmTLGraphicsView::setupSignals()
 {
+    connect(d_->axis, &QmTLDateTimeAxis::visualRangeChanged, this, [this](qint64 visual_min) { horizontalScrollBar()->setValue(mapToAxis(visual_min)); });
 }
 
 bool QmTLGraphicsView::event(QEvent* event)

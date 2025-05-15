@@ -17,10 +17,11 @@ public:
     qreal mapToAxisX(qint64 time_key) const;
     qreal mapToAxis(qint64 time_key) const;
     qreal axisTickPixels() const;
-    qint64 axisTimeKey() const;
+    qint64 axisTickValue() const;
+    qint64 axisRangeInterval() const;
 
+    void setAxisRange(qint64 min, qint64 max);
     void setAxisTickPixels(qreal tick_pixels);
-
     void setScene(QmTLGraphicsScene* scene);
 
 protected:

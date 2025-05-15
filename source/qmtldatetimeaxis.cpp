@@ -11,7 +11,7 @@ struct QmTLDateTimeAxisPrivate {
     qint64 tick_visual_min { 0 };
     // 时间刻度间隔
     qint64 tick_min { 0 };
-    qint64 tick_max { std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::days(1)).count() };
+    qint64 tick_max { std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::days(1)).count() };
     // 时间刻度最小值（单位：毫秒）
     qint64 tick_unit { 100 };
     // 每隔10个刻度显示一个标签
@@ -22,7 +22,8 @@ struct QmTLDateTimeAxisPrivate {
     // 时间刻度标签格式
     QString tick_format { "HH:mm:ss.zz" };
 
-    bool cursor_pressed = false;
+    bool mouse_pressed = false;
+    QPointF mouse_last_pos;
     QSizeF cursor_size { 20, 40 };
     QPointF cursor_pos;
     qreal cursor_line_width { 2 };
@@ -46,6 +47,32 @@ void QmTLDateTimeAxis::setFormat(const QString& format)
     }
     d_->tick_format = format;
     updateTickArea();
+}
+
+void QmTLDateTimeAxis::setRange(qint64 min, qint64 max)
+{
+    bool changed = false;
+    if (d_->tick_min != min) {
+        changed = true;
+        d_->tick_min = min;
+    }
+    if (d_->tick_max != max) {
+        changed = true;
+        d_->tick_max = max;
+    }
+    if (changed) {
+        emit rangeChanged(min, max);
+    }
+}
+
+void QmTLDateTimeAxis::setMin(qint64 min)
+{
+    setRange(min, d_->tick_max);
+}
+
+void QmTLDateTimeAxis::setMax(qint64 max)
+{
+    setRange(d_->tick_min, max);
 }
 
 void QmTLDateTimeAxis::setTickPixels(qreal tick_pixels)
@@ -82,6 +109,11 @@ qint64 QmTLDateTimeAxis::tickUnit() const
     return d_->tick_unit;
 }
 
+qint64 QmTLDateTimeAxis::rangeInterval() const
+{
+    return d_->tick_max - d_->tick_min;
+}
+
 qreal QmTLDateTimeAxis::tickPixels() const
 {
     return d_->tick_pixels;
@@ -97,7 +129,7 @@ qreal QmTLDateTimeAxis::cursorWidth() const
     return d_->cursor_size.width();
 }
 
-qint64 QmTLDateTimeAxis::timeKey() const
+qint64 QmTLDateTimeAxis::value() const
 {
     return qRound(d_->cursor_pos.x() / d_->tick_pixels) * d_->tick_unit + d_->tick_visual_min;
 }
@@ -173,7 +205,8 @@ bool QmTLDateTimeAxis::handleMousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
         if (cursorHeadShape().contains(event->position())) {
-            d_->cursor_pressed = true;
+            d_->mouse_pressed = true;
+            d_->mouse_last_pos = event->position();
             setCursor(Qt::SizeAllCursor);
             return true;
         }
@@ -183,27 +216,28 @@ bool QmTLDateTimeAxis::handleMousePressEvent(QMouseEvent* event)
 
 bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
 {
-    if (!d_->cursor_pressed) {
+    if (!d_->mouse_pressed) {
         return false;
     }
 
     bool need_update = false;
     qreal x = event->position().x();
-    int v_offset = qRound((x - d_->cursor_pos.x()) / d_->tick_pixels);
+    qint64 v_offset = qRound((x - d_->cursor_pos.x()) / d_->tick_pixels * d_->tick_unit);
+    d_->mouse_last_pos = event->position();
     int old_visual_min = d_->tick_visual_min;
     if (x > width() - cursorWidth()) {
         d_->tick_visual_min += v_offset;
         d_->tick_visual_min = qMin(d_->tick_visual_min, d_->tick_max);
         if (old_visual_min != d_->tick_visual_min) {
             need_update = true;
-            emit visualChanged(d_->tick_visual_min);
+            emit visualRangeChanged(d_->tick_visual_min);
         }
     } else if (x < 0) {
         d_->tick_visual_min += v_offset;
         d_->tick_visual_min = qMax(d_->tick_visual_min, d_->tick_min);
         if (old_visual_min != d_->tick_visual_min) {
             need_update = true;
-            emit visualChanged(d_->tick_visual_min);
+            emit visualRangeChanged(d_->tick_visual_min);
         }
     }
 
@@ -229,8 +263,8 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
 
 bool QmTLDateTimeAxis::handleMouseReleaseEvent(QMouseEvent* event)
 {
-    if (d_->cursor_pressed) {
-        d_->cursor_pressed = false;
+    if (d_->mouse_pressed) {
+        d_->mouse_pressed = false;
         setCursor(Qt::ArrowCursor);
         return true;
     }
@@ -337,7 +371,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         painter.drawPath(cursorTailShape());
         painter.restore();
 
-        QString value_str = QDateTime::fromMSecsSinceEpoch(timeKey(), QTimeZone::utc()).toString(d_->tick_format);
+        QString value_str = QDateTime::fromMSecsSinceEpoch(value(), QTimeZone::utc()).toString(d_->tick_format);
         qreal value_str_width = painter.fontMetrics().boundingRect(value_str).width();
         painter.setPen(Qt::black);
         if (d_->cursor_pos.x() + cursorWidth() + value_str_width > width()) {

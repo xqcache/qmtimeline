@@ -15,7 +15,8 @@ struct QmTLGraphicsScenePrivate {
     std::pair<qreal, qreal> scale_factor_range { 0.0, 30.0 };
     QmTLGraphicsModel* model { nullptr };
     QList<QMetaObject::Connection> model_signals;
-    std::map<QmTLItemID, std::unique_ptr<QmTLItemPrimitive>> items;
+
+    std::unordered_map<QmTLItemID, std::unique_ptr<QmTLItemPrimitive>> items;
 };
 
 QmTLGraphicsScene::QmTLGraphicsScene(QObject* parent)
@@ -122,7 +123,6 @@ void QmTLGraphicsScene::onItemAboutToBeRemoved(QmTLItemID item_id)
     if (it == d_->items.end()) {
         return;
     }
-    removeItem(it->second.get());
     d_->items.erase(it);
 }
 

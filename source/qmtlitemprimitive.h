@@ -20,6 +20,8 @@ public:
     inline QmTLGraphicsScene& graphScene();
     inline const QmTLGraphicsScene& graphScene() const;
 
+    inline QmTLItemID itemId() const;
+
     virtual void fitInAxis();
 
 protected:
@@ -41,4 +43,9 @@ inline QmTLGraphicsScene& QmTLItemPrimitive::graphScene()
 inline const QmTLGraphicsScene& QmTLItemPrimitive::graphScene() const
 {
     return scene_;
+}
+
+inline QmTLItemID QmTLItemPrimitive::itemId() const
+{
+    return item_id_;
 }

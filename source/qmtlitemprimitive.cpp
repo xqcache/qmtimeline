@@ -8,7 +8,6 @@ QmTLItemPrimitive::QmTLItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scen
 {
     scene.addItem(this);
     setZValue(0);
-    setY(10);
 }
 
 QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const

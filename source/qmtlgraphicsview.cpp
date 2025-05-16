@@ -91,6 +91,11 @@ void QmTLGraphicsView::setAxisTickPixels(qreal tick_pixels)
     d_->axis->setTickPixels(tick_pixels);
 }
 
+void QmTLGraphicsView::setAxisCursorHeight(int height)
+{
+    d_->axis->setCursorHeight(height);
+}
+
 void QmTLGraphicsView::initUi()
 {
     setDragMode(QGraphicsView::ScrollHandDrag);
@@ -145,6 +150,23 @@ bool QmTLGraphicsView::event(QEvent* event)
 
 void QmTLGraphicsView::resizeEvent(QResizeEvent* event)
 {
+    if (scene()) {
+        bool scene_rect_changed = false;
+        auto scene_rect = sceneRect();
+        if (scene_rect.width() < event->size().width()) {
+            scene_rect.setWidth(event->size().width());
+            scene_rect_changed = true;
+        }
+
+        if (scene_rect.height() < event->size().height()) {
+            scene_rect.setHeight(event->size().height());
+            scene_rect_changed = true;
+        }
+
+        if (scene_rect_changed) {
+            setSceneRect(scene_rect);
+        }
+    }
     QGraphicsView::resizeEvent(event);
     d_->axis->resize(viewport()->width(), viewport()->geometry().bottom());
     setViewportMargins(0, d_->axis->cursorHeight(), 0, 0);

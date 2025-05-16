@@ -15,18 +15,18 @@ struct QmTLDateTimeAxisPrivate {
     // 时间刻度最小值（单位：毫秒）
     qint64 tick_unit { 100 };
     // 每隔10个刻度显示一个标签
-    int tick_label_interval { 10 };
+    int tick_label_interval { 5 };
     // 每个刻度的像素宽度
-    qreal tick_pixels { 20 };
+    qreal tick_pixels { 10 };
 
     // 时间刻度标签格式
     QString tick_format { "HH:mm:ss.zz" };
 
     bool mouse_pressed = false;
     QPointF mouse_last_pos;
-    QSizeF cursor_size { 20, 40 };
+    QSizeF cursor_size { 10, 40 };
     QPointF cursor_pos;
-    qreal cursor_line_width { 2 };
+    qreal cursor_line_width { 1 };
 };
 
 QmTLDateTimeAxis::QmTLDateTimeAxis(QWidget* parent)
@@ -81,6 +81,7 @@ void QmTLDateTimeAxis::setTickPixels(qreal tick_pixels)
         return;
     }
     d_->tick_pixels = tick_pixels;
+    d_->cursor_size.setWidth(tick_pixels);
     updateTickArea();
 }
 
@@ -102,6 +103,13 @@ void QmTLDateTimeAxis::setTickLabelInterval(int tick_label_interval)
     }
     d_->tick_label_interval = tick_label_interval;
     updateTickArea();
+}
+
+void QmTLDateTimeAxis::setCursorHeight(qreal height)
+{
+    d_->cursor_size.setHeight(height);
+    updateTickArea();
+    updateCursorArea();
 }
 
 qint64 QmTLDateTimeAxis::tickUnit() const
@@ -276,10 +284,15 @@ void QmTLDateTimeAxis::updateTickArea()
     update(0, 0, width(), d_->cursor_size.height());
 }
 
+void QmTLDateTimeAxis::updateCursorArea()
+{
+    update(QRectF(d_->cursor_pos, d_->cursor_size).toRect());
+}
+
 QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
 {
     QPainterPath shape;
-    auto cursor_width = cursorWidth() * 0.8;
+    auto cursor_width = cursorWidth() * 0.6;
     auto cursor_height = cursorHeight();
     qreal top_margin = cursor_height * 0.2;
     qreal left_margin = (qMax(d_->tick_pixels, cursorWidth()) - cursor_width) / 2;
@@ -317,11 +330,19 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
 
     QPainter painter(this);
     initPainter(&painter);
-    painter.setRenderHint(QPainter::Antialiasing, true);
     painter.setRenderHint(QPainter::TextAntialiasing, true);
 
-    // TODO: 绘制刻度区域背景色
-    // painter.fillRect(QRect(0, 0, width(), d_->cursor_size.height()), painter.background());
+    {
+        painter.save();
+        QPen pen = painter.pen();
+        pen.setWidthF(0.5);
+        pen.setColor(Qt::black);
+        painter.setPen(pen);
+        painter.drawLine(0, d_->cursor_size.height(), width(), d_->cursor_size.height());
+        painter.restore();
+    }
+
+    painter.setRenderHint(QPainter::Antialiasing, true);
 
     {
         // 绘制刻度线和刻度标签
@@ -336,14 +357,6 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
             if (i % d_->tick_label_interval == 0) {
                 qreal x = i * d_->tick_pixels + qMax(d_->tick_pixels / 2.0, d_->cursor_size.width() / 2);
                 painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, d_->cursor_size.height() * 0.9));
-                // {
-                //     painter.save();
-                //     QPen grid_pen(Qt::gray, 1.0);
-                //     painter.setPen(grid_pen);
-                //     painter.setOpacity(0.8);
-                //     painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, height()));
-                //     painter.restore();
-                // }
                 QDateTime dt = dt_start.addMSecs(i * d_->tick_unit);
                 QString label = dt.toString(d_->tick_format);
                 qreal label_width = painter.fontMetrics().horizontalAdvance(label);

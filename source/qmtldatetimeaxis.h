@@ -20,6 +20,8 @@ public:
     void setTickUnit(qint64 tick_unit);
     void setTickLabelInterval(int tick_label_interval);
 
+    void setCursorHeight(qreal height);
+
     qreal cursorHeight() const;
     qreal cursorWidth() const;
     qint64 tickOffset() const;
@@ -57,7 +59,7 @@ private:
     QPainterPath cursorTailShape() const;
 
     void updateTickArea();
-    void updateCursorArea(const QPointF& pos);
+    void updateCursorArea();
 
 private:
     QmTLDateTimeAxisPrivate* d_ { nullptr };

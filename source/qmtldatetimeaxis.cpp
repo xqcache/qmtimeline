@@ -8,7 +8,7 @@
 
 struct QmTLDateTimeAxisPrivate {
     // 起始时间刻度值（单位：毫秒）
-    qint64 tick_visual_min { 0 };
+    qint64 visual_value_min { 0 };
     // 时间刻度间隔
     qint64 tick_min { 0 };
     qint64 tick_max { std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::days(1)).count() };
@@ -93,7 +93,6 @@ void QmTLDateTimeAxis::setTickUnit(qint64 tick_unit)
     }
     d_->tick_unit = tick_unit;
     updateTickArea();
-    emit tickUnitChanged(tick_unit);
 }
 
 void QmTLDateTimeAxis::setTickLabelInterval(int tick_label_interval)
@@ -137,9 +136,14 @@ qreal QmTLDateTimeAxis::cursorWidth() const
     return d_->cursor_size.width();
 }
 
+qint64 QmTLDateTimeAxis::calcValueByX(qreal x) const
+{
+    return qRound(x / d_->tick_pixels) * d_->tick_unit + d_->visual_value_min;
+}
+
 qint64 QmTLDateTimeAxis::value() const
 {
-    return qRound(d_->cursor_pos.x() / d_->tick_pixels) * d_->tick_unit + d_->tick_visual_min;
+    return calcValueByX(d_->cursor_pos.x());
 }
 
 int QmTLDateTimeAxis::visualTickCount() const
@@ -147,16 +151,20 @@ int QmTLDateTimeAxis::visualTickCount() const
     return (width() - d_->cursor_size.width()) / d_->tick_pixels;
 }
 
+void QmTLDateTimeAxis::scaleByUnit(qreal ratio)
+{
+}
+
 void QmTLDateTimeAxis::scaleUp()
 {
     qint64 old_unit = d_->tick_unit;
     qint64 old_max = visualTickCount() * old_unit;
     qint64 new_max = visualTickCount() * (old_unit - 100);
-    qint64 new_visual_min = qMax(0, d_->tick_visual_min + (new_max - old_max));
-    if (new_visual_min == d_->tick_visual_min) {
+    qint64 new_visual_min = qMax(0, d_->visual_value_min + (new_max - old_max));
+    if (new_visual_min == d_->visual_value_min) {
         return;
     }
-    d_->tick_visual_min = new_visual_min;
+    d_->visual_value_min = new_visual_min;
     setTickUnit(old_unit - 100);
     emit scaleChanged();
 }
@@ -166,14 +174,12 @@ void QmTLDateTimeAxis::scaleDown()
     qint64 old_unit = d_->tick_unit;
     qint64 old_max = visualTickCount() * old_unit;
     qint64 new_max = visualTickCount() * (old_unit + 100);
-    qint64 new_visual_min = qMax(0, d_->tick_visual_min + (new_max - old_max));
-    if (new_visual_min == d_->tick_visual_min) {
+    qint64 new_visual_min = qMax(0, d_->visual_value_min + (new_max - old_max));
+    if (new_visual_min == d_->visual_value_min) {
         return;
     }
 
-    auto old_tick_visual_min = d_->tick_visual_min;
-
-    d_->tick_visual_min = new_visual_min;
+    d_->visual_value_min = new_visual_min;
     setTickUnit(old_unit + 100);
     emit scaleChanged();
 }
@@ -232,20 +238,20 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
     qreal x = event->position().x();
     qint64 v_offset = qRound((x - d_->cursor_pos.x()) / d_->tick_pixels * d_->tick_unit);
     d_->mouse_last_pos = event->position();
-    int old_visual_min = d_->tick_visual_min;
+    int old_visual_min = d_->visual_value_min;
     if (x > width() - cursorWidth()) {
-        d_->tick_visual_min += v_offset;
-        d_->tick_visual_min = qMin(d_->tick_visual_min, d_->tick_max);
-        if (old_visual_min != d_->tick_visual_min) {
+        d_->visual_value_min += v_offset;
+        d_->visual_value_min = qMin(d_->visual_value_min, d_->tick_max);
+        if (old_visual_min != d_->visual_value_min) {
             need_update = true;
-            emit visualRangeChanged(d_->tick_visual_min);
+            emit visualRangeChanged(d_->visual_value_min);
         }
     } else if (x < 0) {
-        d_->tick_visual_min += v_offset;
-        d_->tick_visual_min = qMax(d_->tick_visual_min, d_->tick_min);
-        if (old_visual_min != d_->tick_visual_min) {
+        d_->visual_value_min += v_offset;
+        d_->visual_value_min = qMax(d_->visual_value_min, d_->tick_min);
+        if (old_visual_min != d_->visual_value_min) {
             need_update = true;
-            emit visualRangeChanged(d_->tick_visual_min);
+            emit visualRangeChanged(d_->visual_value_min);
         }
     }
 
@@ -351,13 +357,17 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         pen.setWidth(2);
         painter.setPen(pen);
 
-        QDateTime dt_start = QDateTime::fromMSecsSinceEpoch(d_->tick_min, QTimeZone::utc()).addMSecs(d_->tick_visual_min);
+        QDateTime dt_start = QDateTime::fromMSecsSinceEpoch(d_->tick_min, QTimeZone::utc()).addMSecs(d_->visual_value_min);
+        QDateTime dt_max = QDateTime::fromMSecsSinceEpoch(d_->tick_min, QTimeZone::utc());
         int tick_count = visualTickCount();
         for (int i = 0; i < tick_count; ++i) {
             if (i % d_->tick_label_interval == 0) {
+                QDateTime dt = dt_start.addMSecs(i * d_->tick_unit);
+                if (dt > dt_max) {
+                    break;
+                }
                 qreal x = i * d_->tick_pixels + qMax(d_->tick_pixels / 2.0, d_->cursor_size.width() / 2);
                 painter.drawLine(QPointF(x, d_->cursor_size.height()), QPointF(x, d_->cursor_size.height() * 0.9));
-                QDateTime dt = dt_start.addMSecs(i * d_->tick_unit);
                 QString label = dt.toString(d_->tick_format);
                 qreal label_width = painter.fontMetrics().horizontalAdvance(label);
                 qreal label_x = x - label_width / 2;

@@ -40,7 +40,6 @@ public:
     qint64 value() const;
 
 signals:
-    void tickUnitChanged(qint64 tick_unit);
     void rangeChanged(qint64 min, qint64 max);
     void visualRangeChanged(qint64 visual_min);
     void scaleChanged();
@@ -60,6 +59,10 @@ private:
 
     void updateTickArea();
     void updateCursorArea();
+
+    void scaleByUnit(qreal ratio);
+
+    qint64 calcValueByX(qreal x) const;
 
 private:
     QmTLDateTimeAxisPrivate* d_ { nullptr };

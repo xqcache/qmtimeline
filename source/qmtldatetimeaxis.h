@@ -25,8 +25,11 @@ public:
     qint64 minimum() const;
 
     qint64 rangeInterval() const;
+    void scrollByX(qreal global_x);
     qint64 value() const;
     qint64 visualValue() const;
+    qint64 visualMinValue() const;
+    qint64 visualMaxValue() const;
 
     void setCursorHeight(qreal height);
     qreal cursorHeight() const;
@@ -63,7 +66,7 @@ private:
     int visualTickCount() const;
 
     void scaleByTickUnitRatio(qreal ratio);
-    void scaleByTickUnit(qint64 unit_offset);
+    void setTickUnit(qint64 unit_offset);
 
     qint64 calcVisualValueByX(qreal x) const;
 

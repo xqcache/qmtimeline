@@ -51,12 +51,12 @@ QmTLDateTimeAxis::~QmTLDateTimeAxis() noexcept
 
 void QmTLDateTimeAxis::scaleUp()
 {
-    scaleByTickUnit(-100);
+    scaleByTickUnitRatio(0.5);
 }
 
 void QmTLDateTimeAxis::scaleDown()
 {
-    scaleByTickUnit(100);
+    scaleByTickUnitRatio(2.0);
 }
 
 void QmTLDateTimeAxis::setTickPixels(qreal pixels)
@@ -121,6 +121,51 @@ qint64 QmTLDateTimeAxis::rangeInterval() const
     return d_->maximum - d_->minimum;
 }
 
+void QmTLDateTimeAxis::scrollByX(qreal global_x)
+{
+    qint64 new_value = qRound64(global_x / d_->tick.pixels) * d_->tick.unit;
+    if (new_value == value()) {
+        return;
+    }
+    qreal new_cursor_x = d_->cursor.x();
+    qint64 new_tick_offset = d_->tick.offset;
+
+    const qreal old_cursor_x = d_->cursor.x();
+    const qint64 old_tick_offset = d_->tick.offset;
+    if (new_value < visualMinValue()) {
+        new_cursor_x = 0;
+        new_tick_offset = qMax(d_->minimum, new_value);
+    } else if (new_value > visualMaxValue()) {
+        new_cursor_x = visualTickCount() * d_->tick.pixels;
+        new_tick_offset = qMin(new_value - visualValue(), d_->maximum);
+    } else {
+        new_cursor_x = d_->tick.pixels * (new_value - visualMinValue()) / d_->tick.unit;
+    }
+
+    bool cursor_area_dirty = false;
+    if (!qFuzzyCompare(new_cursor_x, old_cursor_x)) {
+        d_->cursor.pos.setX(new_cursor_x);
+        cursor_area_dirty = true;
+    }
+
+    bool tick_area_dirty = false;
+    if (new_tick_offset != old_tick_offset) {
+        d_->tick.offset = new_tick_offset;
+        tick_area_dirty = true;
+        updateTickArea();
+        emit visualRangeChanged(d_->tick.offset, d_->tick.offset + visualTickCount() * d_->tick.unit);
+    }
+
+    if (cursor_area_dirty) {
+        if (!tick_area_dirty) {
+            updateTickArea();
+        }
+        qreal tail_x_offset = (cursorWidth() - d_->cursor.tail_width) / 2.0;
+        update(new_cursor_x + tail_x_offset, d_->cursor.height, new_cursor_x + tail_x_offset + d_->cursor.tail_width, height());
+        update(d_->cursor.x() + tail_x_offset, d_->cursor.height, d_->cursor.x() + tail_x_offset + d_->cursor.tail_width, height());
+    }
+}
+
 qint64 QmTLDateTimeAxis::value() const
 {
     return visualValue() + d_->tick.offset;
@@ -129,6 +174,16 @@ qint64 QmTLDateTimeAxis::value() const
 qint64 QmTLDateTimeAxis::visualValue() const
 {
     return calcVisualValueByX(d_->cursor.x());
+}
+
+qint64 QmTLDateTimeAxis::visualMinValue() const
+{
+    return d_->tick.offset;
+}
+
+qint64 QmTLDateTimeAxis::visualMaxValue() const
+{
+    return visualMinValue() + visualTickCount() * d_->tick.unit;
 }
 
 void QmTLDateTimeAxis::setCursorHeight(qreal height)
@@ -157,7 +212,7 @@ qreal QmTLDateTimeAxis::mapToAxis(qint64 timestamp, const std::optional<qint64>&
 
 qreal QmTLDateTimeAxis::mapToAxisX(qint64 timestamp) const
 {
-    return mapToAxis(timestamp) + qMax(d_->tick.pixels, cursorWidth()) / 2.0;
+    return mapToAxis(timestamp) + d_->tick.pixels / 2.0;
 }
 
 bool QmTLDateTimeAxis::event(QEvent* event)
@@ -212,7 +267,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
 
         qint64 msces_per_label = d_->tick.label_interval * d_->tick.unit;
         qreal label_per_pixles = d_->tick.pixels * d_->tick.label_interval;
-        qreal label_left_spacing = qMax(d_->tick.pixels, cursorWidth()) / 2.0;
+        qreal label_left_spacing = d_->tick.pixels / 2.0;
 
         QDateTime label_dt = QDateTime::fromMSecsSinceEpoch(d_->tick.offset, QTimeZone::utc());
         QDateTime label_dt_max = QDateTime::fromMSecsSinceEpoch(d_->maximum, QTimeZone::utc());
@@ -256,7 +311,7 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         painter.restore();
 
         // 绘制当前光标值
-        qreal cursor_margin = (qMax(d_->tick.pixels, cursorWidth()) - cursorPaintWidth()) / 2.0;
+        qreal cursor_margin = (d_->tick.pixels - cursorPaintWidth()) / 2.0;
         qreal cursor_right = d_->cursor.x() + cursor_margin + cursorPaintWidth();
         QString value_str = QDateTime::fromMSecsSinceEpoch(value(), QTimeZone::utc()).toString(d_->tick.label_format);
         qreal value_str_width = painter.fontMetrics().boundingRect(value_str).width();
@@ -302,7 +357,7 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
     qint64 v_offset = qRound64(x_offset / d_->tick.pixels) * d_->tick.unit;
     qint64 new_tick_offset = d_->tick.offset;
 
-    if (x > (width() - qMax(d_->tick.pixels, cursorWidth()) / 2.0)) {
+    if (x > (width() - d_->tick.pixels / 2.0)) {
         new_tick_offset += v_offset;
         new_tick_offset = qMin(new_tick_offset, d_->maximum - visualValue());
     } else if (x < 0) {
@@ -352,12 +407,12 @@ int QmTLDateTimeAxis::visualTickCount() const
     return (width() - cursorWidth()) / d_->tick.pixels;
 }
 
-void QmTLDateTimeAxis::scaleByTickUnit(qint64 unit_offset)
+void QmTLDateTimeAxis::setTickUnit(qint64 tick_unit)
 {
     const qint64 max_tick_unit = (d_->maximum - d_->minimum) / visualTickCount();
     const qint64 min_tick_unit = 1;
 
-    qint64 new_tick_unit = qMax(min_tick_unit, qMin(max_tick_unit, d_->tick.unit + unit_offset));
+    qint64 new_tick_unit = qMax(min_tick_unit, qMin(max_tick_unit, tick_unit));
     if (new_tick_unit == d_->tick.unit) {
         return;
     }
@@ -368,7 +423,7 @@ void QmTLDateTimeAxis::scaleByTickUnit(qint64 unit_offset)
 
 void QmTLDateTimeAxis::scaleByTickUnitRatio(qreal ratio)
 {
-    scaleByTickUnit(qRound64(d_->tick.unit * ratio));
+    setTickUnit(qRound64(d_->tick.unit * ratio));
 }
 
 QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
@@ -377,7 +432,7 @@ QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
     auto cursor_paint_width = cursorPaintWidth();
     auto cursor_height = cursorHeight();
     qreal top_margin = cursor_height * 0.2;
-    qreal left_margin = (qMax(d_->tick.pixels, cursorWidth()) - cursor_paint_width) / 2.0;
+    qreal left_margin = (d_->tick.pixels - cursor_paint_width) / 2.0;
     shape.moveTo(left_margin, top_margin);
     shape.lineTo(left_margin, cursor_height * 0.8);
     shape.lineTo(left_margin + cursor_paint_width / 2, cursor_height);
@@ -391,7 +446,7 @@ QPainterPath QmTLDateTimeAxis::cursorHeadShape() const
 QPainterPath QmTLDateTimeAxis::cursorTailShape() const
 {
     QPainterPath shape;
-    qreal left_margin = qMax(d_->tick.pixels, cursorWidth()) / 2;
+    qreal left_margin = d_->tick.pixels / 2;
     shape.moveTo(left_margin, cursorHeight());
     shape.lineTo(left_margin, height());
     shape.translate(d_->cursor.pos);

@@ -23,3 +23,8 @@ std::unique_ptr<QmTLItemPrimitive> TLDemoItemRegistry::createItemPrimitive(int t
     }
     return nullptr;
 }
+
+qreal TLDemoItemRegistry::itemHeight(int type) const
+{
+    return 40;
+}

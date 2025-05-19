@@ -35,6 +35,10 @@ private:
     void initUi();
     void setupSignals();
 
+private slots:
+    void onAxisScaleChanged();
+    void onAxisRangeChanged(qint64 min, qint64 max);
+
 private:
     QmTLGraphicsViewPrivate* d_ { nullptr };
 };

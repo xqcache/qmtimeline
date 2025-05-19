@@ -39,7 +39,7 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
     d_->scene_signals.clear();
     scene->setView(this);
     QGraphicsView::setScene(scene);
-    setSceneRect(0, 0, mapToAxis(axisRangeInterval()), 20000);
+    setSceneRect(0, 0, mapToAxis(d_->axis->rangeInterval()), 20000);
 
     d_->scene_signals.append(connect(scene, &QmTLGraphicsScene::requestScaleAxis, this, [this, scene](bool zoom_in) {
         if (zoom_in) {
@@ -47,12 +47,6 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
         } else {
             d_->axis->scaleDown();
         }
-    }));
-    d_->scene_signals.append(connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, [this, scene] { scene->fitInAxis(); }));
-    d_->scene_signals.append(connect(d_->axis, &QmTLDateTimeAxis::rangeChanged, this, [this, scene](qint64 min, qint64 max) {
-        auto rect = sceneRect();
-        rect.setWidth(scene->mapToAxis(max - min));
-        setSceneRect(rect);
     }));
 }
 
@@ -94,6 +88,7 @@ void QmTLGraphicsView::setAxisTickPixels(qreal tick_pixels)
 void QmTLGraphicsView::setAxisCursorHeight(int height)
 {
     d_->axis->setCursorHeight(height);
+    setViewportMargins(0, height, 0, 0);
 }
 
 void QmTLGraphicsView::initUi()
@@ -105,6 +100,7 @@ void QmTLGraphicsView::initUi()
     setCacheMode(QGraphicsView::CacheBackground);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -115,7 +111,32 @@ void QmTLGraphicsView::initUi()
 
 void QmTLGraphicsView::setupSignals()
 {
-    connect(d_->axis, &QmTLDateTimeAxis::visualRangeChanged, this, [this](qint64 visual_min) { horizontalScrollBar()->setValue(mapToAxis(visual_min)); });
+    connect(d_->axis, &QmTLDateTimeAxis::visualRangeChanged, this, [this](qint64 visual_min, qint64 visual_max) {
+        if (auto* tl_scene = qobject_cast<QmTLGraphicsScene*>(scene()); tl_scene) {
+            horizontalScrollBar()->setValue(d_->axis->mapToAxis(visual_min, 0));
+        }
+    });
+    connect(d_->axis, &QmTLDateTimeAxis::scaleChanged, this, &QmTLGraphicsView::onAxisScaleChanged);
+    connect(d_->axis, &QmTLDateTimeAxis::rangeChanged, this, &QmTLGraphicsView::onAxisRangeChanged);
+}
+
+void QmTLGraphicsView::onAxisScaleChanged()
+{
+    if (auto* tl_scene = qobject_cast<QmTLGraphicsScene*>(scene()); tl_scene) {
+        auto rect = sceneRect();
+        rect.setWidth(qMax<qreal>(d_->axis->mapToAxis(d_->axis->rangeInterval()), viewport()->width()));
+        setSceneRect(rect);
+        tl_scene->fitInAxis();
+    }
+}
+
+void QmTLGraphicsView::onAxisRangeChanged(qint64 min, qint64 max)
+{
+    if (auto* tl_scene = qobject_cast<QmTLGraphicsScene*>(scene()); tl_scene) {
+        auto rect = sceneRect();
+        rect.setWidth(d_->axis->mapToAxis(max - min));
+        setSceneRect(rect);
+    }
 }
 
 bool QmTLGraphicsView::event(QEvent* event)
@@ -150,26 +171,10 @@ bool QmTLGraphicsView::event(QEvent* event)
 
 void QmTLGraphicsView::resizeEvent(QResizeEvent* event)
 {
-    if (scene()) {
-        bool scene_rect_changed = false;
-        auto scene_rect = sceneRect();
-        if (scene_rect.width() < event->size().width()) {
-            scene_rect.setWidth(event->size().width());
-            scene_rect_changed = true;
-        }
-
-        if (scene_rect.height() < event->size().height()) {
-            scene_rect.setHeight(event->size().height());
-            scene_rect_changed = true;
-        }
-
-        if (scene_rect_changed) {
-            setSceneRect(scene_rect);
-        }
-    }
     QGraphicsView::resizeEvent(event);
     d_->axis->resize(viewport()->width(), viewport()->geometry().bottom());
     setViewportMargins(0, d_->axis->cursorHeight(), 0, 0);
+    translate(0, 0);
 }
 
 void QmTLGraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
@@ -181,4 +186,8 @@ void QmTLGraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
     painter->setPen(Qt::red);
     painter->setBrush(Qt::red);
     painter->drawEllipse(0, 0, 10, 10);
+
+    painter->setBrush(Qt::NoBrush);
+    painter->setPen(Qt::green);
+    painter->drawRect(sceneRect());
 }

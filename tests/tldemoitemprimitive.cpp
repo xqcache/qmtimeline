@@ -31,7 +31,7 @@ void TLDemoItemPrimitive::fitInAxis()
     if (!item_model) [[unlikely]] {
         return;
     }
-    qreal x = graphScene().mapToAxisX(item_model->data().timeKey());
+    qreal x = graphScene().mapToAxisX(item_model->data().origin());
 
     if (!qFuzzyCompare(x, this->x())) {
         setX(x);

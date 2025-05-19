@@ -9,6 +9,8 @@
 struct QmTLGraphicsViewPrivate {
     QmTLDateTimeAxis* axis { nullptr };
     QList<QMetaObject::Connection> scene_signals;
+
+    bool skip_hbar_signal = false;
 };
 
 QmTLGraphicsView::QmTLGraphicsView(QWidget* parent)
@@ -113,7 +115,7 @@ void QmTLGraphicsView::setupSignals()
 {
     connect(d_->axis, &QmTLDateTimeAxis::visualRangeChanged, this, [this](qint64 visual_min, qint64 visual_max) {
         if (auto* tl_scene = qobject_cast<QmTLGraphicsScene*>(scene()); tl_scene) {
-            QSignalBlocker block(horizontalScrollBar());
+            d_->skip_hbar_signal = true;
             horizontalScrollBar()->setValue(d_->axis->mapToAxis(visual_min, 0));
         }
     });
@@ -121,6 +123,10 @@ void QmTLGraphicsView::setupSignals()
     connect(d_->axis, &QmTLDateTimeAxis::rangeChanged, this, &QmTLGraphicsView::onAxisRangeChanged);
 
     connect(horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int scene_x) {
+        if (d_->skip_hbar_signal) {
+            d_->skip_hbar_signal = false;
+            return;
+        }
         QSignalBlocker blocker(d_->axis);
         d_->axis->scrollByX(scene_x);
     });

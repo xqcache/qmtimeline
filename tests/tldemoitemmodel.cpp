@@ -19,14 +19,3 @@ int TLDemoItemModel::type() const
     return TLDemoItemModel::Type;
 }
 
-bool TLDemoItemModel::load(const nlohmann::json& json)
-{
-    return true;
-}
-
-nlohmann::json TLDemoItemModel::save() const
-{
-    nlohmann::json json;
-
-    return json;
-}

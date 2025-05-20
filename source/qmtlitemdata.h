@@ -3,9 +3,10 @@
 #include "nlohmann/json.hpp"
 #include "qmflags.h"
 #include "qmtimeline_global.h"
+#include "qmtlserializable.h"
 #include <QVariant>
 
-class QMTIMELINE_EXPORT QmTLItemData {
+class QMTIMELINE_EXPORT QmTLItemData : public QmTlSerializable {
 public:
     enum Role : int {
         NoneRole = 0,
@@ -30,15 +31,35 @@ public:
     void setDuration(qint64 duration);
     qint64 duration() const;
 
+    inline void setDirty(bool dirty = true);
+    inline bool isDirty() const;
+    inline void resetDirty();
+
 public:
-    virtual bool load(const nlohmann::json& json) = 0;
-    virtual nlohmann::json save() const = 0;
+    bool load(const nlohmann::json& json) override;
+    nlohmann::json save() const override;
     virtual bool setProperty(const QVariant& value, int role);
     virtual std::optional<QVariant> property(int role) const;
 
 protected:
     qint64 origin_ { 0 };
     qint64 duration_ { 0 };
+    bool dirty_ { false };
 };
+
+inline void QmTLItemData::setDirty(bool dirty)
+{
+    dirty_ = dirty;
+}
+
+inline bool QmTLItemData::isDirty() const
+{
+    return dirty_;
+}
+
+inline void QmTLItemData::resetDirty()
+{
+    setDirty(false);
+}
 
 QM_DECLARE_FLAGS(QmTLItemDataRoles, QmTLItemData::Role, int);

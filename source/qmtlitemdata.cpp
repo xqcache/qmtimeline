@@ -18,12 +18,36 @@ qint64 QmTLItemData::destination() const
 
 void QmTLItemData::setDuration(qint64 duration)
 {
+    if (duration_ == duration) {
+        return;
+    }
     duration_ = duration;
 }
 
 qint64 QmTLItemData::duration() const
 {
     return duration_;
+}
+
+bool QmTLItemData::load(const nlohmann::json& json)
+{
+    try {
+        origin_ = json.at("origin").get<qint64>();
+        duration_ = json.at("duration").get<qint64>();
+        return true;
+    } catch (const nlohmann::json::exception& excep) {
+
+        QMLOG_ERROR("{}:{} Failed to load item data. Exception: {}", __func__, __LINE__, excep.what());
+        return false;
+    }
+}
+
+nlohmann::json QmTLItemData::save() const
+{
+    nlohmann::json json;
+    json["origin"] = origin_;
+    json["duration"] = duration_;
+    return json;
 }
 
 bool QmTLItemData::setProperty(const QVariant& value, int role)

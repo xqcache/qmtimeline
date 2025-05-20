@@ -34,11 +34,50 @@ void QmTLGraphicsModel::removeItem(QmTLItemID item_id)
 
 void QmTLGraphicsModel::clear()
 {
-    d_->item_modifies.clear();
     for (const auto& [item_id, _] : d_->item_models) {
-        removeItem(item_id);
+        emit itemAboutToBeRemoved(item_id, QPrivateSignal());
+        emit itemRemoved(item_id, QPrivateSignal());
     }
+    d_->item_modifies.clear();
+    d_->item_models.clear();
     d_->next_id = 0;
+}
+
+bool QmTLGraphicsModel::load(const nlohmann::json& json)
+{
+    clear();
+    try {
+        for (const auto& model_j : json["models"]) {
+            auto item_id = model_j["id"].get<QmTLItemID>();
+            int item_type = model_j.at("type").get<int>();
+            auto item_model = d_->item_registry->createItemModel(item_type);
+            if (!item_model) {
+                QMLOG_ERROR("{}:{} Failed to create item model for item type '{}'", __func__, __LINE__, item_type);
+                return false;
+            }
+            if (!item_model->load(model_j)) {
+                return false;
+            }
+            d_->next_id = qMax(d_->next_id, parseItemIdIndex(item_id));
+            d_->item_models[item_id] = std::move(item_model);
+            emit itemCreated(item_id, QPrivateSignal());
+            requestUpdate(item_id);
+        }
+        return true;
+    } catch (const nlohmann::json::exception& excep) {
+        return false;
+    }
+}
+
+nlohmann::json QmTLGraphicsModel::save() const
+{
+    nlohmann::json root;
+    for (const auto& [item_id, item_model] : d_->item_models) {
+        auto json = item_model->save();
+        json["id"] = item_id;
+        root["models"].emplace_back(json);
+    }
+    return root;
 }
 
 QmTLItemModel* QmTLGraphicsModel::itemModel(QmTLItemID item_id) const
@@ -63,6 +102,11 @@ QmTLItemRegistry* QmTLGraphicsModel::itemRegistry() const
 QmTLItemID QmTLGraphicsModel::createItemId(QmTLItemID index, [[maybe_unused]] const void* arg) const
 {
     return index;
+}
+
+QmTLItemID QmTLGraphicsModel::parseItemIdIndex(QmTLItemID item_id) const
+{
+    return item_id;
 }
 
 QmTLItemID QmTLGraphicsModel::createItem(int type, const void* arg)

@@ -3,21 +3,20 @@
 #include "nlohmann/json.hpp"
 #include "qmtimeline_global.h"
 #include "qmtlitemdata.h"
+#include "qmtlserializable.h"
 #include <QObject>
 #include <QVariant>
 
 struct QmTLItemModelPrivate;
 
-class QMTIMELINE_EXPORT QmTLItemModel : public QObject {
+class QMTIMELINE_EXPORT QmTLItemModel : public QObject, public QmTlSerializable {
     Q_OBJECT
 public:
     explicit QmTLItemModel(std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);
     ~QmTLItemModel() noexcept override;
 
-    virtual bool load(const nlohmann::json& json) = 0;
-    virtual nlohmann::json save() const = 0;
-
-    virtual qreal height() const;
+    bool load(const nlohmann::json& json) override;
+    nlohmann::json save() const override;
 
     virtual QmTLItemData& data();
     virtual const QmTLItemData& data() const;

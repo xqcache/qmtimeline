@@ -5,6 +5,8 @@
 #include "tldemoitemregistry.h"
 #include <QAction>
 #include <QApplication>
+#include <QFileDialog>
+#include <QStandardPaths>
 #include <QTimer>
 
 int main(int argc, char* argv[])
@@ -26,6 +28,35 @@ int main(int argc, char* argv[])
             auto& item_data = static_cast<TLDemoItemData&>(item_model->data());
             item_data.setOrigin(view.axisTickValue());
             model->requestUpdate(item_id);
+        }
+    });
+
+    view.addAction("Save", QString("Ctrl+S"), &view, [model, scene, &view] {
+        QString path = QFileDialog::getSaveFileName(&view, "Save model", QStandardPaths::writableLocation(QStandardPaths::DesktopLocation), "(*.json)");
+        if (path.isEmpty()) {
+            return;
+        }
+        QFile file(path);
+        if (!file.open(QFile::WriteOnly)) {
+            return;
+        }
+        file.write(QString::fromStdString(model->save().dump(4)).toUtf8());
+    });
+
+    view.addAction("Open", QString("Ctrl+O"), &view, [model, scene, &view] {
+        QString path = QFileDialog::getOpenFileName(&view, "Save model", QStandardPaths::writableLocation(QStandardPaths::DesktopLocation), "(*.json)");
+        if (path.isEmpty()) {
+            return;
+        }
+        QFile file(path);
+        if (!file.open(QFile::ReadOnly)) {
+            return;
+        }
+        nlohmann::json json = nlohmann::json::parse(file.readAll().toStdString());
+        if (model->load(json)) {
+            qDebug() << "Model load success";
+        } else {
+            qDebug() << "Model load fail!";
         }
     });
 

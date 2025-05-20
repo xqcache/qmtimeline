@@ -10,9 +10,22 @@ QmTLItemModel::~QmTLItemModel() noexcept
 {
 }
 
-qreal QmTLItemModel::height() const
+bool QmTLItemModel::load(const nlohmann::json& json)
 {
-    return 10;
+    try {
+        return data_->load(json.at("internal-data"));
+    } catch (const nlohmann::json::exception& excep) {
+        QMLOG_ERROR("{}:{} Failed to load item model. Exception: {}", __func__, __LINE__, excep.what());
+        return false;
+    }
+}
+
+nlohmann::json QmTLItemModel::save() const
+{
+    nlohmann::json json;
+    json["type"] = type();
+    json["internal-data"] = data_->save();
+    return json;
 }
 
 QmTLItemData& QmTLItemModel::data()

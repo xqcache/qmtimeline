@@ -4,16 +4,6 @@ TLDemoItemData::~TLDemoItemData() noexcept
 {
 }
 
-bool TLDemoItemData::load(const nlohmann::json& json)
-{
-    return true;
-}
-
-nlohmann::json TLDemoItemData::save() const
-{
-    return nlohmann::json();
-}
-
 void TLDemoItemData::setDelay(int delay)
 {
     delay_ = delay;

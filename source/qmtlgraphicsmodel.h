@@ -4,12 +4,13 @@
 #include "qmtimeline_global.h"
 #include "qmtlitemmodel.h"
 #include "qmtlitemregistry.h"
+#include "qmtlserializable.h"
 #include "qmtltypedef.h"
 #include <QObject>
 #include <QVariant>
 
 struct QmTLGraphicsModelPrivate;
-class QMTIMELINE_EXPORT QmTLGraphicsModel : public QObject {
+class QMTIMELINE_EXPORT QmTLGraphicsModel : public QObject, public QmTlSerializable {
     Q_OBJECT
 public:
     explicit QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_registry, QObject* parent = nullptr);
@@ -18,8 +19,8 @@ public:
     virtual void clear();
     virtual void removeItem(QmTLItemID item_id);
 
-    bool load(const nlohmann::json& json);
-    void save(nlohmann::json& json) const;
+    bool load(const nlohmann::json& json) override;
+    nlohmann::json save() const override;
 
     QmTLItemID createItem(int type, const void* arg = nullptr);
     QmTLItemModel* itemModel(QmTLItemID item_id) const;
@@ -50,6 +51,7 @@ signals:
 
 protected:
     virtual QmTLItemID createItemId(QmTLItemID index, const void* arg = nullptr) const;
+    virtual QmTLItemID parseItemIdIndex(QmTLItemID item_id) const;
 
 private:
     bool isItemBatchModified(QmTLItemID item_id) const;

@@ -12,3 +12,9 @@
 #else
 #define QMTIMELINE_EXPORT
 #endif
+
+#ifndef QMLOG_ERROR
+#include <QDebug>
+#include <format>
+#define QMLOG_ERROR(fmt, ...) qDebug() << std::format(fmt, __VA_ARGS__)
+#endif

@@ -138,7 +138,8 @@ QRectF TLDemoItemPrimitive::calcBoundingRect() const
     }
     auto delay = item_model->data<TLDemoItemData>().delay();
     qreal tick_pixels = graphScene().axisTickPixels();
-    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels, item_model->height());
+    return QRectF(-tick_pixels / 2.0, 0, delay.has_value() ? graphScene().mapToAxis(*delay) + tick_pixels : tick_pixels,
+        graphModel()->itemRegistry()->itemHeight(TLDemoItemModel::Type));
 }
 
 void TLDemoItemPrimitive::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)

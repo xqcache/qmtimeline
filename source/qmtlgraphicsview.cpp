@@ -7,6 +7,8 @@
 #include <QWheelEvent>
 
 struct QmTLGraphicsViewPrivate {
+    QWidget* vbar_filler { nullptr };
+
     QmTLDateTimeAxis* axis { nullptr };
     QList<QMetaObject::Connection> scene_signals;
 
@@ -41,7 +43,7 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
     d_->scene_signals.clear();
     scene->setView(this);
     QGraphicsView::setScene(scene);
-    setSceneRect(0, 0, mapToAxis(d_->axis->rangeInterval()), 20000);
+    setSceneRect(0, 0, mapToAxis(d_->axis->rangeInterval()), 0);
 
     d_->scene_signals.append(connect(scene, &QmTLGraphicsScene::requestScaleAxis, this, [this, scene](bool zoom_in) {
         if (zoom_in) {
@@ -50,6 +52,13 @@ void QmTLGraphicsView::setScene(QmTLGraphicsScene* scene)
             d_->axis->scaleDown();
         }
     }));
+}
+
+void QmTLGraphicsView::setSceneHeight(qreal height)
+{
+    auto rect = sceneRect();
+    rect.setHeight(height);
+    setSceneRect(rect);
 }
 
 qreal QmTLGraphicsView::mapToAxisX(qint64 time_key) const
@@ -77,6 +86,11 @@ qint64 QmTLGraphicsView::axisRangeInterval() const
     return d_->axis->rangeInterval();
 }
 
+qreal QmTLGraphicsView::axisCursorHeight() const
+{
+    return d_->axis->cursorHeight();
+}
+
 void QmTLGraphicsView::setAxisTickLabelFormat(const QString& date_fmt)
 {
     d_->axis->setTickLabelFormat(date_fmt);
@@ -94,6 +108,7 @@ void QmTLGraphicsView::setAxisTickPixels(qreal tick_pixels)
 
 void QmTLGraphicsView::setAxisCursorHeight(int height)
 {
+    d_->vbar_filler->setFixedHeight(height);
     d_->axis->setCursorHeight(height);
     setViewportMargins(0, height, 0, 0);
 }
@@ -114,6 +129,10 @@ void QmTLGraphicsView::initUi()
     setFrameShape(QFrame::NoFrame);
 
     setBackgroundBrush(QColor("#BDBDBD"));
+
+    d_->vbar_filler = new QWidget(this);
+    d_->vbar_filler->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    addScrollBarWidget(d_->vbar_filler, Qt::AlignTop);
 }
 
 void QmTLGraphicsView::setupSignals()
@@ -191,7 +210,6 @@ void QmTLGraphicsView::resizeEvent(QResizeEvent* event)
     QGraphicsView::resizeEvent(event);
     d_->axis->resize(viewport()->width(), viewport()->geometry().bottom());
     setViewportMargins(0, d_->axis->cursorHeight(), 0, 0);
-    translate(0, 0);
 }
 
 void QmTLGraphicsView::drawBackground(QPainter* painter, const QRectF& rect)

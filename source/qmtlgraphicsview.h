@@ -19,12 +19,14 @@ public:
     qreal axisTickPixels() const;
     qint64 axisTickValue() const;
     qint64 axisRangeInterval() const;
+    qreal axisCursorHeight() const;
 
     void setAxisTickLabelFormat(const QString& date_fmt);
     void setAxisRange(qint64 min, qint64 max);
     void setAxisTickPixels(qreal tick_pixels);
     void setAxisCursorHeight(int height);
     void setScene(QmTLGraphicsScene* scene);
+    void setSceneHeight(qreal height);
 
 protected:
     bool event(QEvent* event) override;

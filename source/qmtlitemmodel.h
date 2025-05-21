@@ -36,7 +36,8 @@ public:
     }
 
     enum {
-        Type = 0,
+        None = 0,
+        Type = 1,
         UserType = 10
     };
 

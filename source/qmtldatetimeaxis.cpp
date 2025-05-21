@@ -341,6 +341,9 @@ bool QmTLDateTimeAxis::handleMousePressEvent(QMouseEvent* event)
         return false;
     }
     d_->mouse_pressed = true;
+    if (cursor().shape() != Qt::SizeAllCursor) {
+        setCursor(Qt::SizeAllCursor);
+    }
     return true;
 }
 
@@ -350,6 +353,9 @@ bool QmTLDateTimeAxis::handleMouseReleaseEvent(QMouseEvent* event)
         return false;
     }
     d_->mouse_pressed = false;
+    if (cursor().shape() != Qt::ArrowCursor) {
+        setCursor(Qt::ArrowCursor);
+    }
     return true;
 }
 

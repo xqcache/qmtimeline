@@ -23,6 +23,7 @@ public:
     inline QmTLItemID itemId() const;
 
     virtual void fitInAxis();
+    virtual void updatePosition();
 
 protected:
     QmTLGraphicsModel* graphModel() const;

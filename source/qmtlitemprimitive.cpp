@@ -32,3 +32,7 @@ void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles, const QVariant& p
 void QmTLItemPrimitive::fitInAxis()
 {
 }
+
+void QmTLItemPrimitive::updatePosition()
+{
+}

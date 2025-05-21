@@ -15,6 +15,8 @@ public:
     void scaleUp();
     void scaleDown();
 
+    void setTickLabelFormat(const QString& fmt);
+
     void setTickPixels(qreal pixels);
     qreal tickPixels() const;
 

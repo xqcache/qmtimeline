@@ -31,12 +31,12 @@ qint64 QmTLItemData::duration() const
 
 bool QmTLItemData::load(const nlohmann::json& json)
 {
+    resetDirty();
     try {
         origin_ = json.at("origin").get<qint64>();
         duration_ = json.at("duration").get<qint64>();
         return true;
     } catch (const nlohmann::json::exception& excep) {
-
         QMLOG_ERROR("{}:{} Failed to load item data. Exception: {}", __func__, __LINE__, excep.what());
         return false;
     }

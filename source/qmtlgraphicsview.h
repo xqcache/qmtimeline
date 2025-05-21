@@ -20,6 +20,7 @@ public:
     qint64 axisTickValue() const;
     qint64 axisRangeInterval() const;
 
+    void setAxisTickLabelFormat(const QString& date_fmt);
     void setAxisRange(qint64 min, qint64 max);
     void setAxisTickPixels(qreal tick_pixels);
     void setAxisCursorHeight(int height);

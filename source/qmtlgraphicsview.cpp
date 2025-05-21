@@ -77,6 +77,11 @@ qint64 QmTLGraphicsView::axisRangeInterval() const
     return d_->axis->rangeInterval();
 }
 
+void QmTLGraphicsView::setAxisTickLabelFormat(const QString& date_fmt)
+{
+    d_->axis->setTickLabelFormat(date_fmt);
+}
+
 void QmTLGraphicsView::setAxisRange(qint64 min, qint64 max)
 {
     d_->axis->setRange(min, max);

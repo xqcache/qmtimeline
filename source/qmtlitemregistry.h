@@ -13,5 +13,5 @@ public:
     virtual std::unique_ptr<QmTLItemModel> createItemModel(int type) const = 0;
     virtual std::unique_ptr<QmTLItemPrimitive> createItemPrimitive(int type, QmTLItemID item_id, QmTLGraphicsScene& scene) const = 0;
 
-    virtual qreal itemHeight(int type) const = 0;
+    virtual qreal itemHeight() const = 0;
 };

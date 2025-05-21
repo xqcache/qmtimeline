@@ -109,14 +109,14 @@ QmTLItemID QmTLGraphicsModel::parseItemIdIndex(QmTLItemID item_id) const
     return item_id;
 }
 
-QmTLItemID QmTLGraphicsModel::createItem(int type, const void* arg)
+QmTLItemID QmTLGraphicsModel::createItem(int type, const void* args)
 {
     auto item_model = d_->item_registry->createItemModel(type);
     if (!item_model) {
         return kQmTLInvalidItemID;
     }
 
-    QmTLItemID item_id = createItemId(d_->next_id++, arg);
+    QmTLItemID item_id = createItemId(d_->next_id++, args);
     d_->item_models[item_id] = std::move(item_model);
     emit itemCreated(item_id, QPrivateSignal());
     return item_id;

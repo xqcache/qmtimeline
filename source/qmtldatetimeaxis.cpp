@@ -59,6 +59,12 @@ void QmTLDateTimeAxis::scaleDown()
     scaleByTickUnitRatio(2.0);
 }
 
+void QmTLDateTimeAxis::setTickLabelFormat(const QString& fmt)
+{
+    d_->tick.label_format = fmt;
+    updateTickArea();
+}
+
 void QmTLDateTimeAxis::setTickPixels(qreal pixels)
 {
     if (qFuzzyCompare(d_->tick.pixels, pixels)) {

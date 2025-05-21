@@ -22,7 +22,7 @@ public:
     bool load(const nlohmann::json& json) override;
     nlohmann::json save() const override;
 
-    QmTLItemID createItem(int type, const void* arg = nullptr);
+    QmTLItemID createItem(int type, const void* args = nullptr);
     QmTLItemModel* itemModel(QmTLItemID item_id) const;
     bool itemExists(QmTLItemID item_id) const;
 

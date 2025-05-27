@@ -435,7 +435,10 @@ void QmTLDateTimeAxis::setTickUnit(qint64 tick_unit)
 
 void QmTLDateTimeAxis::scaleByTickUnitRatio(qreal ratio)
 {
-    setTickUnit(qRound64(d_->tick.unit * ratio));
+    // 最少为10fps
+    qint64 tick_unit = qMax(100, qRound64(d_->tick.unit * ratio));
+
+    setTickUnit(tick_unit);
 }
 
 QPainterPath QmTLDateTimeAxis::cursorHeadShape() const

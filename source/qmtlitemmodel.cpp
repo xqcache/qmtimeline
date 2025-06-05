@@ -46,7 +46,7 @@ const QmTLItemData& QmTLItemModel::data() const
     return *data_.get();
 }
 
-QList<QmTLItemModel::DataElement> QmTLItemModel::dataElements() const
+QList<QmTLItemModel::DataElement> QmTLItemModel::editableElements() const
 {
     return {};
 }

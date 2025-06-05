@@ -225,12 +225,12 @@ void QmTLGraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
     painter->setRenderHint(QPainter::Antialiasing);
     painter->fillRect(rect, backgroundBrush());
 
-    // TODO: 绘制一个虚拟的原点，后期删除
-    painter->setPen(Qt::red);
-    painter->setBrush(Qt::red);
-    painter->drawEllipse(0, 0, 10, 10);
+    // // TODO: 绘制一个虚拟的原点，后期删除
+    // painter->setPen(Qt::red);
+    // painter->setBrush(Qt::red);
+    // painter->drawEllipse(0, 0, 10, 10);
 
-    painter->setBrush(Qt::NoBrush);
-    painter->setPen(Qt::green);
-    painter->drawRect(sceneRect());
+    // painter->setBrush(Qt::NoBrush);
+    // painter->setPen(Qt::green);
+    // painter->drawRect(sceneRect());
 }

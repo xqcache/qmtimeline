@@ -65,6 +65,8 @@ void QmTLGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 
     if (object->type() == QmTLItemPrimitive::Type) {
         auto* item_primitive = static_cast<QmTLItemPrimitive*>(object);
+        clearSelection();
+        item_primitive->setSelected(true);
         emit requestItemContextMenu(item_primitive->itemId());
         return;
     }

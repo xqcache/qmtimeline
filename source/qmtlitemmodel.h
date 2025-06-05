@@ -55,7 +55,7 @@ public:
 
     virtual QString name() const = 0;
 
-    virtual QList<DataElement> dataElements() const;
+    virtual QList<DataElement> editableElements() const;
 
 protected:
     QmTLGraphicsModel* graph_model_ { nullptr };

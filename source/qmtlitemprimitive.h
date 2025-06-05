@@ -25,6 +25,13 @@ public:
     virtual void fitInAxis();
     virtual void updatePosition();
 
+public:
+    enum {
+        Type = UserType + 2
+    };
+
+    int type() const override;
+
 protected:
     QmTLGraphicsModel* graphModel() const;
 

@@ -24,6 +24,7 @@ public:
     QmTLGraphicsModel* model() const;
 
     void setView(QmTLGraphicsView* view);
+    QmTLGraphicsView* view() const;
 
     qreal mapToAxis(qint64 time_key) const;
     qreal mapToAxisX(qint64 time_key) const;
@@ -36,10 +37,13 @@ public:
 
 signals:
     void requestScaleAxis(bool zoom_in);
+    void requestSceneContextMenu();
+    void requestItemContextMenu(QmTLItemID item_id);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
     void wheelEvent(QGraphicsSceneWheelEvent* event) override;
 
 private slots:

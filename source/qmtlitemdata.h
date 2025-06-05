@@ -18,7 +18,7 @@ public:
     inline constexpr static Role userRole(qint64 index)
     {
         assert(index < 32 && "The role must be less than 32.");
-        return static_cast<Role>(1 << (index + 10));
+        return static_cast<Role>(1 << (index + 5));
     }
 
 public:

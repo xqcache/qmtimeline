@@ -7,12 +7,22 @@
 #include <QObject>
 #include <QVariant>
 
+class QmTLGraphicsModel;
+
 struct QmTLItemModelPrivate;
 
 class QMTIMELINE_EXPORT QmTLItemModel : public QObject, public QmTlSerializable {
     Q_OBJECT
 public:
-    explicit QmTLItemModel(std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);
+    struct DataElement {
+        QString label;
+        int role;
+        bool readonly;
+        QString widget_type;
+        std::map<QString, QVariant> widget_properties;
+    };
+
+    explicit QmTLItemModel(QmTLGraphicsModel* graph_model, std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);
     ~QmTLItemModel() noexcept override;
 
     bool load(const nlohmann::json& json) override;
@@ -43,6 +53,9 @@ public:
 
     virtual int type() const = 0;
 
+    virtual QList<DataElement> dataElements() const;
+
 protected:
+    QmTLGraphicsModel* graph_model_ { nullptr };
     std::unique_ptr<QmTLItemData> data_;
 };

@@ -48,6 +48,29 @@ void QmTLGraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
     }
 }
 
+void QmTLGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+{
+    // 将事件传输给GraphicsItem
+    QPointF pos = event->scenePos();
+    auto* item = itemAt(pos, QTransform());
+    if (!item) {
+        emit requestSceneContextMenu();
+        return;
+    }
+    auto* object = item->toGraphicsObject();
+    if (!object) {
+        emit requestSceneContextMenu();
+        return;
+    }
+
+    if (object->type() == QmTLItemPrimitive::Type) {
+        auto* item_primitive = static_cast<QmTLItemPrimitive*>(object);
+        emit requestItemContextMenu(item_primitive->itemId());
+        return;
+    }
+    emit requestSceneContextMenu();
+}
+
 void QmTLGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
     QGraphicsScene::wheelEvent(event);
@@ -91,6 +114,11 @@ QmTLGraphicsModel* QmTLGraphicsScene::model() const
 void QmTLGraphicsScene::setView(QmTLGraphicsView* view)
 {
     d_->view = view;
+}
+
+QmTLGraphicsView* QmTLGraphicsScene::view() const
+{
+    return d_->view;
 }
 
 qreal QmTLGraphicsScene::mapToAxis(qint64 time_key) const

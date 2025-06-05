@@ -42,6 +42,10 @@ public:
 
     QmTLItemRegistry* itemRegistry() const;
 
+    void setTimeRange(qint64 minimum, qint64 maximum);
+    qint64 timeMinimum() const;
+    qint64 timeMaximum() const;
+
 signals:
     // 标记为内部信号，外部无法使用model对象来发送
     void itemCreated(QmTLItemID item_id, QPrivateSignal);

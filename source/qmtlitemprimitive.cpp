@@ -36,3 +36,8 @@ void QmTLItemPrimitive::fitInAxis()
 void QmTLItemPrimitive::updatePosition()
 {
 }
+
+int QmTLItemPrimitive::type() const
+{
+    return Type;
+}

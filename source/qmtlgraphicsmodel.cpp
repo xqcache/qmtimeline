@@ -3,6 +3,7 @@
 #include "qmtlitemregistry.h"
 
 struct QmTLGraphicsModelPrivate {
+    std::pair<qint64, qint64> time_range;
     std::unique_ptr<QmTLItemRegistry> item_registry;
     std::map<QmTLItemID, std::unique_ptr<QmTLItemModel>> item_models;
     QmTLItemID next_id { 0 };
@@ -14,6 +15,7 @@ QmTLGraphicsModel::QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_regi
     , d_(new QmTLGraphicsModelPrivate)
 {
     d_->item_registry = std::move(item_registry);
+    d_->time_range = std::make_pair<qint64, qint64>(0, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(4)).count());
 }
 
 QmTLGraphicsModel::~QmTLGraphicsModel() noexcept
@@ -43,14 +45,15 @@ void QmTLGraphicsModel::clear()
     d_->next_id = 0;
 }
 
-bool QmTLGraphicsModel::load(const nlohmann::json& json)
+bool QmTLGraphicsModel::load(const nlohmann::json& root)
 {
     clear();
     try {
-        for (const auto& model_j : json["models"]) {
+        root["time-range"].get_to(d_->time_range);
+        for (const auto& model_j : root["models"]) {
             auto item_id = model_j["id"].get<QmTLItemID>();
             int item_type = model_j.at("type").get<int>();
-            auto item_model = d_->item_registry->createItemModel(item_type);
+            auto item_model = d_->item_registry->createItemModel(this, item_type);
             if (!item_model) {
                 QMLOG_ERROR("{}:{} Failed to create item model for item type '{}'", __func__, __LINE__, item_type);
                 return false;
@@ -72,6 +75,7 @@ bool QmTLGraphicsModel::load(const nlohmann::json& json)
 nlohmann::json QmTLGraphicsModel::save() const
 {
     nlohmann::json root;
+    root["time-range"] = d_->time_range;
     for (const auto& [item_id, item_model] : d_->item_models) {
         auto json = item_model->save();
         json["id"] = item_id;
@@ -99,6 +103,21 @@ QmTLItemRegistry* QmTLGraphicsModel::itemRegistry() const
     return d_->item_registry.get();
 }
 
+void QmTLGraphicsModel::setTimeRange(qint64 minimum, qint64 maximum)
+{
+    d_->time_range = std::make_pair(minimum, maximum);
+}
+
+qint64 QmTLGraphicsModel::timeMinimum() const
+{
+    return d_->time_range.first;
+}
+
+qint64 QmTLGraphicsModel::timeMaximum() const
+{
+    return d_->time_range.second;
+}
+
 QmTLItemID QmTLGraphicsModel::createItemId(QmTLItemID index, [[maybe_unused]] const void* arg) const
 {
     return index;
@@ -111,7 +130,7 @@ QmTLItemID QmTLGraphicsModel::parseItemIdIndex(QmTLItemID item_id) const
 
 QmTLItemID QmTLGraphicsModel::createItem(int type, const void* args)
 {
-    auto item_model = d_->item_registry->createItemModel(type);
+    auto item_model = d_->item_registry->createItemModel(this, type);
     if (!item_model) {
         return kQmTLInvalidItemID;
     }

@@ -1,7 +1,9 @@
 #include "qmtlitemmodel.h"
+#include "qmtlgraphicsmodel.h"
 
-QmTLItemModel::QmTLItemModel(std::unique_ptr<QmTLItemData> item_data, QObject* parent)
+QmTLItemModel::QmTLItemModel(QmTLGraphicsModel* graph_model, std::unique_ptr<QmTLItemData> item_data, QObject* parent)
     : QObject(parent)
+    , graph_model_(graph_model)
     , data_(std::move(item_data))
 {
 }
@@ -42,4 +44,9 @@ const QmTLItemData& QmTLItemModel::data() const
         assert(0 && "The Item data has not been initialized");
     }
     return *data_.get();
+}
+
+QList<QmTLItemModel::DataElement> QmTLItemModel::dataElements() const
+{
+    return {};
 }

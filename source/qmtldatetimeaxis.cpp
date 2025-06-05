@@ -241,6 +241,11 @@ bool QmTLDateTimeAxis::event(QEvent* event)
             event->ignore();
             return true;
         }
+        break;
+    case QEvent::ContextMenu:
+        event->ignore();
+        return true;
+        break;
     default:
         break;
     }

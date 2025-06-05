@@ -1,6 +1,7 @@
 #include "qmtlgraphicsview.h"
 #include "qmtldatetimeaxis.h"
 #include "qmtlgraphicsscene.h"
+#include <QContextMenuEvent>
 #include <QPainter>
 #include <QResizeEvent>
 #include <QScrollBar>
@@ -197,6 +198,13 @@ bool QmTLGraphicsView::event(QEvent* event)
             return true;
         }
         QAbstractScrollArea::wheelEvent(old_evt);
+        return true;
+    } break;
+    case QEvent::ContextMenu: {
+        QContextMenuEvent* old_evt = static_cast<QContextMenuEvent*>(event);
+        QContextMenuEvent* new_evt
+            = new QContextMenuEvent(old_evt->reason(), viewport()->mapFromGlobal(old_evt->globalPos()), old_evt->globalPos(), old_evt->modifiers());
+        qApp->sendEvent(viewport(), new_evt);
         return true;
     } break;
     default:

@@ -42,7 +42,7 @@ public:
         requires(std::is_base_of_v<QmTLItemData, T>)
     const T& data() const
     {
-        return static_cast<T&>(data());
+        return static_cast<const T&>(data());
     }
 
     enum {
@@ -52,6 +52,8 @@ public:
     };
 
     virtual int type() const = 0;
+
+    virtual QString name() const = 0;
 
     virtual QList<DataElement> dataElements() const;
 

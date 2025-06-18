@@ -5,6 +5,7 @@
 #include "qmtlitemdata.h"
 #include "qmtlserializable.h"
 #include <QObject>
+#include <QPalette>
 #include <QVariant>
 
 class QmTLGraphicsModel;
@@ -57,7 +58,17 @@ public:
 
     virtual QList<DataElement> editableElements() const;
 
+    virtual const QPalette& palette() const;
+
+    inline QmTLGraphicsModel* graphModel() const;
+
 protected:
     QmTLGraphicsModel* graph_model_ { nullptr };
     std::unique_ptr<QmTLItemData> data_;
+    QPalette palette_;
 };
+
+inline QmTLGraphicsModel* QmTLItemModel::graphModel() const
+{
+    return graph_model_;
+}

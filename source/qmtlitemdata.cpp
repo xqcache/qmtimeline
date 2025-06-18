@@ -1,6 +1,11 @@
 #include "qmtlitemdata.h"
 #include "qmtltypedef.h"
 
+QmTLItemData::QmTLItemData(QmTLItemModel* item_model)
+    : item_model_(item_model)
+{
+}
+
 void QmTLItemData::setOrigin(qint64 origin)
 {
     origin_ = origin;

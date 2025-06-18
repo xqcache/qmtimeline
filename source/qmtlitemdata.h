@@ -6,6 +6,7 @@
 #include "qmtlserializable.h"
 #include <QVariant>
 
+class QMTIMELINE_EXPORT QmTLItemModel;
 class QMTIMELINE_EXPORT QmTLItemData : public QmTlSerializable {
 public:
     enum Role : int {
@@ -22,6 +23,7 @@ public:
     }
 
 public:
+    explicit QmTLItemData(QmTLItemModel* item_model);
     virtual ~QmTLItemData() noexcept = default;
 
     void setOrigin(qint64 origin);
@@ -42,6 +44,7 @@ public:
     virtual std::optional<QVariant> property(int role) const;
 
 protected:
+    QmTLItemModel* item_model_ { nullptr };
     qint64 origin_ { 0 };
     qint64 duration_ { 0 };
     bool dirty_ { false };

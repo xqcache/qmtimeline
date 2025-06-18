@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneWheelEvent>
+#include <QPalette>
 
 struct QmTLGraphicsScenePrivate {
     qreal row_height = 30;

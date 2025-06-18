@@ -6,6 +6,7 @@ QmTLItemModel::QmTLItemModel(QmTLGraphicsModel* graph_model, std::unique_ptr<QmT
     , graph_model_(graph_model)
     , data_(std::move(item_data))
 {
+    palette_.setBrush(QPalette::ColorRole::Base, Qt::red);
 }
 
 QmTLItemModel::~QmTLItemModel() noexcept
@@ -49,4 +50,9 @@ const QmTLItemData& QmTLItemModel::data() const
 QList<QmTLItemModel::DataElement> QmTLItemModel::editableElements() const
 {
     return {};
+}
+
+const QPalette& QmTLItemModel::palette() const
+{
+    return palette_;
 }

@@ -225,26 +225,22 @@ bool QmTLDateTimeAxis::event(QEvent* event)
 {
     switch (event->type()) {
     case QEvent::MouseButtonPress:
-        if (!handleMousePressEvent(static_cast<QMouseEvent*>(event))) {
-            event->ignore();
+        if (handleMousePressEvent(static_cast<QMouseEvent*>(event))) {
+            event->accept();
             return true;
         }
         break;
     case QEvent::MouseButtonRelease:
-        if (!handleMouseReleaseEvent(static_cast<QMouseEvent*>(event))) {
-            event->ignore();
+        if (handleMouseReleaseEvent(static_cast<QMouseEvent*>(event))) {
+            event->accept();
             return true;
         }
         break;
     case QEvent::MouseMove:
-        if (!handleMouseMoveEvent(static_cast<QMouseEvent*>(event))) {
-            event->ignore();
+        if (handleMouseMoveEvent(static_cast<QMouseEvent*>(event))) {
+            event->accept();
             return true;
         }
-        break;
-    case QEvent::ContextMenu:
-        event->ignore();
-        return true;
         break;
     default:
         break;
@@ -371,6 +367,11 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
     }
     qreal x = qRound64(event->position().x() / d_->tick.pixels) * d_->tick.pixels;
     qreal x_offset = event->position().x() - d_->cursor.x();
+
+    if (std::abs(x_offset) < d_->tick.pixels) {
+        return true;
+    }
+
     qint64 v_offset = qRound64(x_offset / d_->tick.pixels) * d_->tick.unit;
     qint64 new_tick_offset = d_->tick.offset;
 
@@ -387,7 +388,7 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
 
     qint64 new_value = calcVisualValueByX(x) + new_tick_offset;
     if ((new_value < d_->minimum || new_value > d_->maximum)) {
-        return false;
+        return true;
     }
 
     const qint64 old_tick_offset = d_->tick.offset;

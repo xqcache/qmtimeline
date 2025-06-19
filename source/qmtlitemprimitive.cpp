@@ -27,6 +27,13 @@ void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles, const QVariant& p
             setX(new_x);
         }
     }
+    if (roles.testFlag(QmTLItemData::ToolTipRole)) {
+        auto* item_model = graphModel()->itemModel(item_id_);
+        if (!item_model) {
+            return;
+        }
+        setToolTip(item_model->data().toolTip());
+    }
 }
 
 void QmTLItemPrimitive::fitInAxis()

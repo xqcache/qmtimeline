@@ -13,6 +13,7 @@ public:
         NoneRole = 0,
         OriginRole = 0x01,
         DurationRole = 0x02,
+        ToolTipRole = 0x04,
         AllRole = std::numeric_limits<int>::max()
     };
 
@@ -25,6 +26,7 @@ public:
 public:
     explicit QmTLItemData(QmTLItemModel* item_model);
     virtual ~QmTLItemData() noexcept = default;
+    Q_DISABLE_COPY_MOVE(QmTLItemData);
 
     void setOrigin(qint64 origin);
     qint64 origin() const;
@@ -36,6 +38,8 @@ public:
     inline void setDirty(bool dirty = true);
     inline bool isDirty() const;
     inline void resetDirty();
+
+    virtual QString toolTip() const;
 
 public:
     bool load(const nlohmann::json& json) override;

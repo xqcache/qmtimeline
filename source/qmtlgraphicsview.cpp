@@ -122,7 +122,7 @@ void QmTLGraphicsView::initUi()
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setCacheMode(QGraphicsView::CacheBackground);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-    setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+    setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
     setAlignment(Qt::AlignLeft | Qt::AlignTop);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -206,6 +206,9 @@ bool QmTLGraphicsView::event(QEvent* event)
             = new QContextMenuEvent(old_evt->reason(), viewport()->mapFromGlobal(old_evt->globalPos()), old_evt->globalPos(), old_evt->modifiers());
         qApp->sendEvent(viewport(), new_evt);
         return true;
+    } break;
+    case QEvent::ToolTip: {
+        return viewportEvent(event);
     } break;
     default:
         break;

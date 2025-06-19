@@ -4,6 +4,7 @@
 #include "qmtimeline_global.h"
 #include "qmtlitemdata.h"
 #include "qmtlserializable.h"
+#include "qmtltypedef.h"
 #include <QObject>
 #include <QPalette>
 #include <QVariant>
@@ -23,8 +24,9 @@ public:
         std::map<QString, QVariant> widget_properties;
     };
 
-    explicit QmTLItemModel(QmTLGraphicsModel* graph_model, std::unique_ptr<QmTLItemData> item_data, QObject* parent = nullptr);
+    explicit QmTLItemModel(QmTLItemID item_id, std::unique_ptr<QmTLItemData> item_data, QmTLGraphicsModel* graph_model, QObject* parent = nullptr);
     ~QmTLItemModel() noexcept override;
+    Q_DISABLE_COPY_MOVE(QmTLItemModel);
 
     bool load(const nlohmann::json& json) override;
     nlohmann::json save() const override;
@@ -62,13 +64,21 @@ public:
 
     inline QmTLGraphicsModel* graphModel() const;
 
+    inline QmTLItemID itemId() const;
+
 protected:
     QmTLGraphicsModel* graph_model_ { nullptr };
     std::unique_ptr<QmTLItemData> data_;
+    QmTLItemID item_id_ { kQmTLInvalidItemID };
     QPalette palette_;
 };
 
 inline QmTLGraphicsModel* QmTLItemModel::graphModel() const
 {
     return graph_model_;
+}
+
+inline QmTLItemID QmTLItemModel::itemId() const
+{
+    return item_id_;
 }

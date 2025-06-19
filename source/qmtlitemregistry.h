@@ -10,7 +10,7 @@ class QMTIMELINE_EXPORT QmTLItemRegistry {
 public:
     virtual ~QmTLItemRegistry() noexcept = default;
 
-    virtual std::unique_ptr<QmTLItemModel> createItemModel(QmTLGraphicsModel* graph_model, int type) const = 0;
+    virtual std::unique_ptr<QmTLItemModel> createItemModel(int type, QmTLItemID item_id, QmTLGraphicsModel* graph_model) const = 0;
     virtual std::unique_ptr<QmTLItemPrimitive> createItemPrimitive(int type, QmTLItemID item_id, QmTLGraphicsScene& scene) const = 0;
 
     virtual qreal itemHeight() const = 0;

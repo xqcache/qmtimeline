@@ -8,7 +8,10 @@ QmTLItemData::QmTLItemData(QmTLItemModel* item_model)
 
 void QmTLItemData::setOrigin(qint64 origin)
 {
-    origin_ = origin;
+    if (origin != origin_) {
+        origin_ = origin;
+        dirty_ = true;
+    }
 }
 
 qint64 QmTLItemData::origin() const
@@ -27,6 +30,7 @@ void QmTLItemData::setDuration(qint64 duration)
         return;
     }
     duration_ = duration;
+    dirty_ = true;
 }
 
 qint64 QmTLItemData::duration() const
@@ -81,4 +85,9 @@ std::optional<QVariant> QmTLItemData::property(int role) const
         break;
     }
     return std::nullopt;
+}
+
+QString QmTLItemData::toolTip() const
+{
+    return QObject::tr("Origin: %1\nDuration: %2").arg(origin_).arg(duration_);
 }

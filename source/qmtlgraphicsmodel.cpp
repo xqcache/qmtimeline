@@ -53,7 +53,7 @@ bool QmTLGraphicsModel::load(const nlohmann::json& root)
         for (const auto& model_j : root["models"]) {
             auto item_id = model_j["id"].get<QmTLItemID>();
             int item_type = model_j.at("type").get<int>();
-            auto item_model = d_->item_registry->createItemModel(this, item_type);
+            auto item_model = d_->item_registry->createItemModel(item_id, item_type, this);
             if (!item_model) {
                 QMLOG_ERROR("{}:{} Failed to create item model for item type '{}'", __func__, __LINE__, item_type);
                 return false;
@@ -130,12 +130,12 @@ QmTLItemID QmTLGraphicsModel::parseItemIdIndex(QmTLItemID item_id) const
 
 QmTLItemID QmTLGraphicsModel::createItem(int type, const void* args)
 {
-    auto item_model = d_->item_registry->createItemModel(this, type);
+    QmTLItemID item_id = createItemId(d_->next_id++, args);
+    auto item_model = d_->item_registry->createItemModel(type, item_id, this);
     if (!item_model) {
         return kQmTLInvalidItemID;
     }
 
-    QmTLItemID item_id = createItemId(d_->next_id++, args);
     d_->item_models[item_id] = std::move(item_model);
     emit itemCreated(item_id, QPrivateSignal());
     return item_id;

@@ -1,8 +1,9 @@
 #include "qmtlitemmodel.h"
 #include "qmtlgraphicsmodel.h"
 
-QmTLItemModel::QmTLItemModel(QmTLGraphicsModel* graph_model, std::unique_ptr<QmTLItemData> item_data, QObject* parent)
+QmTLItemModel::QmTLItemModel(QmTLItemID item_id, std::unique_ptr<QmTLItemData> item_data, QmTLGraphicsModel* graph_model, QObject* parent)
     : QObject(parent)
+    , item_id_(item_id)
     , graph_model_(graph_model)
     , data_(std::move(item_data))
 {

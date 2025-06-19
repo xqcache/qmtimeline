@@ -15,6 +15,7 @@ class QMTIMELINE_EXPORT QmTLGraphicsModel : public QObject, public QmTlSerializa
 public:
     explicit QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_registry, QObject* parent = nullptr);
     ~QmTLGraphicsModel() noexcept override;
+    Q_DISABLE_COPY_MOVE(QmTLGraphicsModel);
 
     virtual void clear();
     virtual void removeItem(QmTLItemID item_id);

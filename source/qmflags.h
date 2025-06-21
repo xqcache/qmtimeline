@@ -65,6 +65,12 @@ public:
         return on ? (*this |= flag) : (*this &= ~QmFlags(flag));
     }
 
+    constexpr inline QmFlags &orFlags(const QmFlags &flags) noexcept
+    {
+        *this |= flags;
+        return *this;
+    }
+
 
     friend constexpr inline bool operator==(QmFlags lhs, QmFlags rhs) noexcept
     { return lhs.i_ == rhs.i_; }

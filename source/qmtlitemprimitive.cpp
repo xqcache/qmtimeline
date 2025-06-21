@@ -15,7 +15,7 @@ QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const
     return scene_.model();
 }
 
-void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles, const QVariant& param)
+void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles)
 {
     if (roles.testFlag(QmTLItemData::OriginRole)) {
         auto* item_model = graphModel()->itemModel(item_id_);
@@ -34,6 +34,10 @@ void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles, const QVariant& p
         }
         setToolTip(item_model->data().toolTip());
     }
+}
+
+void QmTLItemPrimitive::onItemOperate(QmTLItemDataRoles roles, const QVariant& param)
+{
 }
 
 void QmTLItemPrimitive::fitInAxis()

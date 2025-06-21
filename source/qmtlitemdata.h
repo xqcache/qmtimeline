@@ -6,13 +6,14 @@
 #include "qmtlserializable.h"
 #include <QVariant>
 
+class QMTIMELINE_EXPORT QmTLGraphicsModel;
 class QMTIMELINE_EXPORT QmTLItemModel;
 class QMTIMELINE_EXPORT QmTLItemData : public QmTlSerializable {
 public:
     enum Role : int {
         NoneRole = 0,
         OriginRole = 0x01,
-        DurationRole = 0x02,
+        DelayRole = 0x02,
         ToolTipRole = 0x04,
         AllRole = std::numeric_limits<int>::max()
     };
@@ -32,12 +33,14 @@ public:
     qint64 origin() const;
     qint64 destination() const;
 
-    void setDuration(qint64 duration);
-    qint64 duration() const;
+    void setDelay(qint64 duration);
+    qint64 delay() const;
 
     inline void setDirty(bool dirty = true);
     inline bool isDirty() const;
     inline void resetDirty();
+
+    QmTLGraphicsModel* graphModel() const;
 
     virtual QString toolTip() const;
 
@@ -48,9 +51,12 @@ public:
     virtual std::optional<QVariant> property(int role) const;
 
 protected:
+    void notifyPropertyChanged(int role);
+
+protected:
     QmTLItemModel* item_model_ { nullptr };
     qint64 origin_ { 0 };
-    qint64 duration_ { 0 };
+    qint64 delay_ { 0 };
     bool dirty_ { false };
 };
 

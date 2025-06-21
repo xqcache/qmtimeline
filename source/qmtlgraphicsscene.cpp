@@ -106,6 +106,7 @@ void QmTLGraphicsScene::setModel(QmTLGraphicsModel* model)
 
     d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemCreated, this, &QmTLGraphicsScene::onItemCreated));
     d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemChanged, this, &QmTLGraphicsScene::onItemChanged));
+    d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemOperate, this, &QmTLGraphicsScene::onItemOperate));
     d_->model_signals.append(connect(d_->model, &QmTLGraphicsModel::itemAboutToBeRemoved, this, &QmTLGraphicsScene::onItemAboutToBeRemoved));
 }
 
@@ -157,10 +158,17 @@ void QmTLGraphicsScene::onItemAboutToBeRemoved(QmTLItemID item_id)
     d_->items.erase(it);
 }
 
-void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
+void QmTLGraphicsScene::onItemOperate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
 {
     if (auto* item = graphItem(item_id); item) {
-        item->onDataChanged(roles, param);
+        item->onItemOperate(roles, param);
+    }
+}
+
+void QmTLGraphicsScene::onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles)
+{
+    if (auto* item = graphItem(item_id); item) {
+        item->onDataChanged(roles);
     }
 }
 

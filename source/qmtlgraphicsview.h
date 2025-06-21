@@ -28,6 +28,8 @@ public:
     void setScene(QmTLGraphicsScene* scene);
     void setSceneHeight(qreal height);
 
+    void moveAxisCursor(qint64 value);
+
 protected:
     bool event(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;

@@ -148,11 +148,6 @@ void QmTLGraphicsModel::setItemProperty(QmTLItemID item_id, const QVariant& data
         return;
     }
     item_model->data().setProperty(data, role);
-    if (isItemBatchModified(item_id)) {
-        d_->item_modifies[item_id].setFlag(role);
-    } else {
-        requestUpdate(item_id, role);
-    }
 }
 
 std::optional<QVariant> QmTLGraphicsModel::itemProperty(QmTLItemID item_id, int role) const
@@ -164,9 +159,18 @@ std::optional<QVariant> QmTLGraphicsModel::itemProperty(QmTLItemID item_id, int 
     return item_model->data().property(role);
 }
 
-void QmTLGraphicsModel::requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
+void QmTLGraphicsModel::requestUpdate(QmTLItemID item_id, QmTLItemDataRoles roles)
 {
-    emit itemChanged(item_id, roles, param, QPrivateSignal());
+    if (isItemBatchModified(item_id)) {
+        d_->item_modifies[item_id].orFlags(roles);
+    } else {
+        emit itemChanged(item_id, roles, QPrivateSignal());
+    }
+}
+
+void QmTLGraphicsModel::requestItemOperate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param)
+{
+    emit itemOperate(item_id, roles, param, QPrivateSignal());
 }
 
 void QmTLGraphicsModel::beginBatchModify(QmTLItemID item_id)
@@ -178,7 +182,7 @@ void QmTLGraphicsModel::endBatchModify(QmTLItemID item_id)
 {
     auto it = d_->item_modifies.find(item_id);
     if (it != d_->item_modifies.end() && it->second != QmTLItemData::NoneRole) {
-        requestUpdate(item_id, it->second);
+        emit itemChanged(item_id, it->second, QPrivateSignal());
         d_->item_modifies.erase(it);
     }
 }

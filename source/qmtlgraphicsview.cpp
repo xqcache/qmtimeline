@@ -114,6 +114,10 @@ void QmTLGraphicsView::setAxisCursorHeight(int height)
     setViewportMargins(0, height, 0, 0);
 }
 
+void QmTLGraphicsView::moveAxisCursor(qint64 value)
+{
+}
+
 void QmTLGraphicsView::initUi()
 {
     setDragMode(QGraphicsView::ScrollHandDrag);

@@ -36,7 +36,8 @@ protected:
     QmTLGraphicsModel* graphModel() const;
 
     friend class QmTLGraphicsScene;
-    virtual void onDataChanged(QmTLItemDataRoles roles, const QVariant& param);
+    virtual void onDataChanged(QmTLItemDataRoles roles);
+    virtual void onItemOperate(QmTLItemDataRoles roles, const QVariant& param);
 
 protected:
     QmTLGraphicsScene& scene_;

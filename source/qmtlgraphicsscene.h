@@ -49,7 +49,8 @@ protected:
 private slots:
     void onItemCreated(QmTLItemID item_id);
     void onItemAboutToBeRemoved(QmTLItemID item_id);
-    void onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param);
+    void onItemChanged(QmTLItemID item_id, QmTLItemDataRoles roles);
+    void onItemOperate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param);
 
 private:
     QmTLGraphicsScenePrivate* d_ { nullptr };

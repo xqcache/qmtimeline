@@ -23,7 +23,8 @@ public:
     inline QmTLItemID itemId() const;
 
     virtual void fitInAxis();
-    virtual void updatePosition();
+    virtual void updateX();
+    virtual void updateY();
 
 public:
     enum {

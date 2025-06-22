@@ -8,6 +8,7 @@ QmTLItemPrimitive::QmTLItemPrimitive(QmTLItemID item_id, QmTLGraphicsScene& scen
 {
     scene.addItem(this);
     setZValue(0);
+    updateX();
 }
 
 QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const
@@ -18,14 +19,7 @@ QmTLGraphicsModel* QmTLItemPrimitive::graphModel() const
 void QmTLItemPrimitive::onDataChanged(QmTLItemDataRoles roles)
 {
     if (roles.testFlag(QmTLItemData::OriginRole)) {
-        auto* item_model = graphModel()->itemModel(item_id_);
-        if (!item_model) {
-            return;
-        }
-        auto new_x = scene_.mapToAxisX(item_model->data().origin());
-        if (!qFuzzyCompare(new_x, x())) {
-            setX(new_x);
-        }
+        updateX();
     }
     if (roles.testFlag(QmTLItemData::ToolTipRole)) {
         auto* item_model = graphModel()->itemModel(item_id_);
@@ -44,7 +38,19 @@ void QmTLItemPrimitive::fitInAxis()
 {
 }
 
-void QmTLItemPrimitive::updatePosition()
+void QmTLItemPrimitive::updateX()
+{
+    auto* item_model = graphModel()->itemModel(item_id_);
+    if (!item_model) {
+        return;
+    }
+    auto new_x = scene_.mapToAxisX(item_model->data().origin());
+    if (!qFuzzyCompare(new_x, x())) {
+        setX(new_x);
+    }
+}
+
+void QmTLItemPrimitive::updateY()
 {
 }
 

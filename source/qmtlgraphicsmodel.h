@@ -50,6 +50,7 @@ public:
 
 signals:
     // 标记为内部信号，外部无法使用model对象来发送
+    void itemAboutToBeCreated(QmTLItemID item_id, QPrivateSignal);
     void itemCreated(QmTLItemID item_id, QPrivateSignal);
     void itemRemoved(QmTLItemID item_id, QPrivateSignal);
     void itemAboutToBeRemoved(QmTLItemID item_id, QPrivateSignal);
@@ -59,6 +60,12 @@ signals:
 protected:
     virtual QmTLItemID createItemId(QmTLItemID index, const void* arg = nullptr) const;
     virtual QmTLItemID parseItemIdIndex(QmTLItemID item_id) const;
+
+    void notifyItemRemoved(QmTLItemID item_id);
+    void notifyItemAboutToBeRemoved(QmTLItemID item_id);
+
+    void notifyItemCreated(QmTLItemID item_id);
+    void notifyItemAboutToBeCreated(QmTLItemID item_id);
 
 private:
     bool isItemBatchModified(QmTLItemID item_id) const;

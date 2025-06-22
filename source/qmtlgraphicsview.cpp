@@ -116,6 +116,7 @@ void QmTLGraphicsView::setAxisCursorHeight(int height)
 
 void QmTLGraphicsView::moveAxisCursor(qint64 value)
 {
+    d_->axis->setValue(value);
 }
 
 void QmTLGraphicsView::initUi()

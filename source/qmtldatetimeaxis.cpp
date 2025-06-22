@@ -13,7 +13,7 @@ struct QmTLDateTimeAxisPrivate {
     struct Tick {
         QString label_format { "HH:mm:ss.zz" };
         // 每个刻度所表示的时间单位（单位：毫秒）
-        qint64 unit { 100 };
+        qint64 unit { 1000 };
         // 刻度表示的时间偏移
         qint64 offset { 0 };
         // 刻度像素单位
@@ -175,6 +175,40 @@ void QmTLDateTimeAxis::scrollByX(qreal global_x)
 qint64 QmTLDateTimeAxis::value() const
 {
     return visualValue() + d_->tick.offset;
+}
+
+void QmTLDateTimeAxis::setValue(qint64 value)
+{
+    bool tick_area_dirty = false;
+    if (value < visualMinValue()) {
+        tick_area_dirty = true;
+        d_->tick.offset = value;
+        emit visualRangeChanged(d_->tick.offset, d_->tick.offset + visualTickCount() * d_->tick.unit);
+    } else if (value > visualMaxValue()) {
+        tick_area_dirty = true;
+        d_->tick.offset = value - visualTickCount() * d_->tick.unit;
+        emit visualRangeChanged(d_->tick.offset, d_->tick.offset + visualTickCount() * d_->tick.unit);
+    }
+
+    bool cursor_area_dirty = false;
+    qint64 v_offset = value - d_->tick.offset;
+    qreal new_cursor_x = qRound64(static_cast<double>(v_offset) / d_->tick.unit) * d_->tick.pixels;
+    const auto old_cursor_x = d_->cursor.x();
+    if (!qFuzzyCompare(d_->cursor.pos.x(), new_cursor_x)) {
+        cursor_area_dirty = true;
+        d_->cursor.pos.setX(new_cursor_x);
+    }
+    if (tick_area_dirty) {
+        updateTickArea();
+    }
+    if (cursor_area_dirty) {
+        if (!tick_area_dirty) {
+            updateTickArea();
+        }
+        qreal tail_x_offset = (cursorWidth() - d_->cursor.tail_width) / 2.0;
+        update(old_cursor_x + tail_x_offset, d_->cursor.height, old_cursor_x + tail_x_offset + d_->cursor.tail_width, height());
+        update(d_->cursor.x() + tail_x_offset, d_->cursor.height, d_->cursor.x() + tail_x_offset + d_->cursor.tail_width, height());
+    }
 }
 
 qint64 QmTLDateTimeAxis::visualValue() const
@@ -365,8 +399,9 @@ bool QmTLDateTimeAxis::handleMouseMoveEvent(QMouseEvent* event)
     if (!d_->mouse_pressed) {
         return false;
     }
-    qreal x = qRound64(event->position().x() / d_->tick.pixels) * d_->tick.pixels;
-    qreal x_offset = event->position().x() - d_->cursor.x();
+    qreal mouse_x = event->position().x() - d_->tick.pixels / 2.0;
+    qreal x = qRound64(mouse_x / d_->tick.pixels) * d_->tick.pixels;
+    qreal x_offset = mouse_x - d_->cursor.x();
 
     if (std::abs(x_offset) < d_->tick.pixels) {
         return true;

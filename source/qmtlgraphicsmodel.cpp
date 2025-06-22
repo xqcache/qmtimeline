@@ -131,6 +131,7 @@ QmTLItemID QmTLGraphicsModel::parseItemIdIndex(QmTLItemID item_id) const
 QmTLItemID QmTLGraphicsModel::createItem(int type, const void* args)
 {
     QmTLItemID item_id = createItemId(d_->next_id++, args);
+    notifyItemAboutToBeCreated(item_id);
     auto item_model = d_->item_registry->createItemModel(type, item_id, this);
     if (!item_model) {
         return kQmTLInvalidItemID;
@@ -190,4 +191,24 @@ void QmTLGraphicsModel::endBatchModify(QmTLItemID item_id)
 bool QmTLGraphicsModel::isItemBatchModified(QmTLItemID item_id) const
 {
     return d_->item_modifies.contains(item_id);
+}
+
+void QmTLGraphicsModel::notifyItemRemoved(QmTLItemID item_id)
+{
+    emit itemRemoved(item_id, QPrivateSignal());
+}
+
+void QmTLGraphicsModel::notifyItemAboutToBeRemoved(QmTLItemID item_id)
+{
+    emit itemAboutToBeRemoved(item_id, QPrivateSignal());
+}
+
+void QmTLGraphicsModel::notifyItemCreated(QmTLItemID item_id)
+{
+    emit itemCreated(item_id, QPrivateSignal());
+}
+
+void QmTLGraphicsModel::notifyItemAboutToBeCreated(QmTLItemID item_id)
+{
+    emit itemAboutToBeCreated(item_id, QPrivateSignal());
 }

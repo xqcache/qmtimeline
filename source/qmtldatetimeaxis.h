@@ -29,6 +29,7 @@ public:
     qint64 rangeInterval() const;
     void scrollByX(qreal global_x);
     qint64 value() const;
+    void setValue(qint64 value);
     qint64 visualValue() const;
     qint64 visualMinValue() const;
     qint64 visualMaxValue() const;

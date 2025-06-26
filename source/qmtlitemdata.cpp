@@ -106,3 +106,9 @@ QmTLGraphicsModel* QmTLItemData::graphModel() const
 {
     return item_model_->graphModel();
 }
+
+QDebug operator<<(QDebug d, const QmTLItemData& data)
+{
+    d << "QmTLItemData(origin=" << data.origin() << ", delay=" << data.delay() << ")";
+    return d;
+}

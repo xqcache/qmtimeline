@@ -8,6 +8,8 @@ struct QmTLGraphicsModelPrivate {
     std::map<QmTLItemID, std::unique_ptr<QmTLItemModel>> item_models;
     QmTLItemID next_id { 0 };
     std::unordered_map<QmTLItemID, QmTLItemDataRoles> item_modifies;
+    bool dirty_ { false };
+    bool block_load_finished_ { false };
 };
 
 QmTLGraphicsModel::QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_registry, QObject* parent)
@@ -16,6 +18,8 @@ QmTLGraphicsModel::QmTLGraphicsModel(std::unique_ptr<QmTLItemRegistry> item_regi
 {
     d_->item_registry = std::move(item_registry);
     d_->time_range = std::make_pair<qint64, qint64>(0, std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::hours(4)).count());
+
+    connect(this, &QmTLGraphicsModel::loadFinished, this, [this] { resetDirty(); });
 }
 
 QmTLGraphicsModel::~QmTLGraphicsModel() noexcept
@@ -47,13 +51,14 @@ void QmTLGraphicsModel::clear()
 
 bool QmTLGraphicsModel::load(const nlohmann::json& root)
 {
+    auto release_signal_block = qScopeGuard([this] { d_->block_load_finished_ = false; });
     clear();
     try {
         root["time-range"].get_to(d_->time_range);
         for (const auto& model_j : root["models"]) {
             auto item_id = model_j["id"].get<QmTLItemID>();
             int item_type = model_j.at("type").get<int>();
-            auto item_model = d_->item_registry->createItemModel(item_id, item_type, this);
+            auto item_model = d_->item_registry->createItemModel(item_type, item_id, this);
             if (!item_model) {
                 QMLOG_ERROR("{}:{} Failed to create item model for item type '{}'", __func__, __LINE__, item_type);
                 return false;
@@ -65,6 +70,9 @@ bool QmTLGraphicsModel::load(const nlohmann::json& root)
             d_->item_models[item_id] = std::move(item_model);
             emit itemCreated(item_id, QPrivateSignal());
             requestUpdate(item_id);
+        }
+        if (!d_->block_load_finished_) {
+            emit loadFinished();
         }
         return true;
     } catch (const nlohmann::json::exception& excep) {
@@ -211,4 +219,36 @@ void QmTLGraphicsModel::notifyItemCreated(QmTLItemID item_id)
 void QmTLGraphicsModel::notifyItemAboutToBeCreated(QmTLItemID item_id)
 {
     emit itemAboutToBeCreated(item_id, QPrivateSignal());
+}
+
+bool QmTLGraphicsModel::isDirty() const
+{
+    if (d_->dirty_) {
+        return true;
+    }
+
+    for (const auto& [_, item_model] : d_->item_models) {
+        if (item_model->data().isDirty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void QmTLGraphicsModel::setDirty(bool dirty)
+{
+    d_->dirty_ = dirty;
+}
+
+void QmTLGraphicsModel::resetDirty()
+{
+    setDirty(false);
+    for (const auto& [_, item_model] : d_->item_models) {
+        item_model->data().resetDirty();
+    }
+}
+
+void QmTLGraphicsModel::blockLoadFinished()
+{
+    d_->block_load_finished_ = true;
 }

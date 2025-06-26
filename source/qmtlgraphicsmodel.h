@@ -48,6 +48,10 @@ public:
     qint64 timeMinimum() const;
     qint64 timeMaximum() const;
 
+    bool isDirty() const;
+    void setDirty(bool dirty = true);
+    void resetDirty();
+
 signals:
     // 标记为内部信号，外部无法使用model对象来发送
     void itemAboutToBeCreated(QmTLItemID item_id, QPrivateSignal);
@@ -56,6 +60,8 @@ signals:
     void itemAboutToBeRemoved(QmTLItemID item_id, QPrivateSignal);
     void itemChanged(QmTLItemID item_id, QmTLItemDataRoles roles, QPrivateSignal);
     void itemOperate(QmTLItemID item_id, QmTLItemDataRoles roles, const QVariant& param, QPrivateSignal);
+
+    void loadFinished();
 
 protected:
     virtual QmTLItemID createItemId(QmTLItemID index, const void* arg = nullptr) const;
@@ -66,6 +72,8 @@ protected:
 
     void notifyItemCreated(QmTLItemID item_id);
     void notifyItemAboutToBeCreated(QmTLItemID item_id);
+
+    void blockLoadFinished();
 
 private:
     bool isItemBatchModified(QmTLItemID item_id) const;

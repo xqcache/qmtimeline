@@ -75,4 +75,6 @@ inline void QmTLItemData::resetDirty()
     setDirty(false);
 }
 
+QDebug QMTIMELINE_EXPORT operator<<(QDebug, const QmTLItemData&);
+
 QM_DECLARE_FLAGS(QmTLItemDataRoles, QmTLItemData::Role, int);

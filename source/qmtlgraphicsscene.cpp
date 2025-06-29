@@ -77,18 +77,20 @@ void QmTLGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 void QmTLGraphicsScene::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
     QGraphicsScene::wheelEvent(event);
-    qreal scale_factor = d_->scale_factor;
-    if (event->delta() > 0) {
-        scale_factor += 0.1;
-    } else {
-        scale_factor -= 0.1;
-    }
-    scale_factor = qMax(d_->scale_factor_range.first, qMin(scale_factor, d_->scale_factor_range.second));
-    if (!qFuzzyCompare(d_->scale_factor, scale_factor)) {
-        d_->scale_factor = scale_factor;
-        emit requestScaleAxis(event->delta() > 0);
-    }
-    event->accept();
+    // TODO: 暂时禁用这个功能
+
+    // qreal scale_factor = d_->scale_factor;
+    // if (event->delta() > 0) {
+    //     scale_factor += 0.1;
+    // } else {
+    //     scale_factor -= 0.1;
+    // }
+    // scale_factor = qMax(d_->scale_factor_range.first, qMin(scale_factor, d_->scale_factor_range.second));
+    // if (!qFuzzyCompare(d_->scale_factor, scale_factor)) {
+    //     d_->scale_factor = scale_factor;
+    //     emit requestScaleAxis(event->delta() > 0);
+    // }
+    // event->accept();
 }
 
 void QmTLGraphicsScene::setModel(QmTLGraphicsModel* model)

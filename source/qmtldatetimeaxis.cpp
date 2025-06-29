@@ -192,7 +192,7 @@ void QmTLDateTimeAxis::setValue(qint64 value)
 
     bool cursor_area_dirty = false;
     qint64 v_offset = value - d_->tick.offset;
-    qreal new_cursor_x = qRound64(static_cast<double>(v_offset) / d_->tick.unit) * d_->tick.pixels;
+    qreal new_cursor_x = static_cast<double>(v_offset) / d_->tick.unit * d_->tick.pixels;
     const auto old_cursor_x = d_->cursor.x();
     if (!qFuzzyCompare(d_->cursor.pos.x(), new_cursor_x)) {
         cursor_area_dirty = true;

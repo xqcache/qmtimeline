@@ -186,25 +186,28 @@ bool QmTLGraphicsView::event(QEvent* event)
     switch (event->type()) {
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
-    case QEvent::MouseButtonDblClick: {
-        QMouseEvent* old_evt = static_cast<QMouseEvent*>(event);
-        QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
-            old_evt->button(), old_evt->buttons(), old_evt->modifiers(), old_evt->pointingDevice());
-        qApp->sendEvent(viewport(), new_evt);
-        return true;
-    } break;
+    case QEvent::MouseButtonDblClick:
     case QEvent::Wheel: {
-        QWheelEvent* old_evt = static_cast<QWheelEvent*>(event);
-        if (old_evt->modifiers() == Qt::ControlModifier) {
-            QWheelEvent* new_evt
-                = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(), old_evt->pixelDelta(), old_evt->angleDelta(),
-                    old_evt->buttons(), old_evt->modifiers(), old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
-            qApp->sendEvent(viewport(), new_evt);
-            return true;
-        }
-        QAbstractScrollArea::wheelEvent(old_evt);
-        return true;
+        // QMouseEvent* old_evt = static_cast<QMouseEvent*>(event);
+        // QMouseEvent* new_evt = new QMouseEvent(old_evt->type(), viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(),
+        //     old_evt->button(), old_evt->buttons(), old_evt->modifiers(), old_evt->pointingDevice());
+        // qApp->sendEvent(viewport(), new_evt);
+        // return true;
+        return viewportEvent(event);
     } break;
+    // case QEvent::Wheel: {
+    //     QWheelEvent* old_evt = static_cast<QWheelEvent*>(event);
+    //     if (old_evt->modifiers() == Qt::ControlModifier) {
+    //         QWheelEvent* new_evt
+    //             = new QWheelEvent(viewport()->mapFromGlobal(old_evt->globalPosition()), old_evt->globalPosition(), old_evt->pixelDelta(),
+    //             old_evt->angleDelta(),
+    //                 old_evt->buttons(), old_evt->modifiers(), old_evt->phase(), old_evt->inverted(), old_evt->source(), old_evt->pointingDevice());
+    //         qApp->sendEvent(viewport(), new_evt);
+    //         return true;
+    //     }
+    //     QAbstractScrollArea::wheelEvent(old_evt);
+    //     return true;
+    // } break;
     case QEvent::ContextMenu: {
         QContextMenuEvent* old_evt = static_cast<QContextMenuEvent*>(event);
         QContextMenuEvent* new_evt

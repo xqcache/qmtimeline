@@ -292,7 +292,6 @@ void QmTLDateTimeAxis::paintEvent(QPaintEvent* event)
         // 1. 绘制刻度区域背景色
         painter.save();
         painter.setPen(Qt::black);
-        painter.fillRect(QRectF(0, 0, width(), d_->cursor.height), QColor("#bdbdbd"));
         painter.drawLine(0, d_->cursor.height, width(), d_->cursor.height);
         painter.restore();
     }

@@ -1,0 +1,16 @@
+if(NOT TIMELINE_FMT_EXTERNAL)
+    set(BUILD_SHARED_LIBS ON)
+    set(FMT_INSTALL OFF)
+    add_subdirectory(fmt)
+endif()
+
+if(NOT TIMELINE_JSON_EXTERNAL)
+    set(JSON_Install ON)
+    add_subdirectory(json)
+endif()
+
+if(NOT TIMELINE_SPDLOG_EXTERNAL)
+    set(SPDLOG_BUILD_SHARED ON)
+    set(SPDLOG_INSTALL OFF)
+    add_subdirectory(spdlog)
+endif()

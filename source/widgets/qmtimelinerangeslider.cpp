@@ -5,6 +5,8 @@
 #include <QPainterPath>
 #include <QRegularExpression>
 
+namespace qmtl {
+
 struct QmTimelineRangeSliderPrivate {
     int handle_width { 10 };
     double fps { 24.0 };
@@ -556,3 +558,4 @@ qreal QmTimelineRangeSlider::detalV() const
 {
     return 1.0 * (d_->frame_range[1] - d_->frame_range[0]) / innerWidth();
 }
+} // namespace qmtl

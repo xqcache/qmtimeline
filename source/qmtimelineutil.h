@@ -4,6 +4,8 @@
 
 #include <QString>
 
+namespace qmtl {
+
 class QMTIMELINE_LIB_EXPORT QmTimelineUtil {
 public:
     static QString formatTimeCode(qint64 value, double fps);
@@ -14,3 +16,5 @@ public:
 
     static qint64 frameToTime(qint64 frame_no, double fps);
 };
+
+} // namespace qmtl

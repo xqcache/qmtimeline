@@ -9,6 +9,7 @@
 #include <QGraphicsSceneContextMenuEvent>
 #include <QUndoStack>
 
+namespace qmtl {
 struct QmTimelineScenePrivate {
     QmTimelineView* view { nullptr };
     QmTimelineItemModel* model { nullptr };
@@ -302,3 +303,4 @@ QUndoStack* QmTimelineScene::undoStack() const
 {
     return d_->undo_stack;
 }
+} // namespace qmtl

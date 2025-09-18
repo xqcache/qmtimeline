@@ -7,6 +7,8 @@
 #include <QPainterPath>
 #include <QScrollBar>
 
+namespace qmtl {
+
 struct QmTimelineAxisPrivate {
     QmTimelineView* view { nullptr };
 
@@ -358,3 +360,5 @@ void QmTimelineAxis::movePlayhead(qint64 frame_no)
     d_->playhead.x = x;
     update();
 }
+
+} // namespace qmtl

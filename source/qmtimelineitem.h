@@ -7,6 +7,8 @@
 #include <QPalette>
 #include <QVariant>
 
+namespace qmtl {
+
 class QmTimelineItemModel;
 
 class QMTIMELINE_LIB_EXPORT QmTimelineItem : public QmTimelineSerializable {
@@ -190,3 +192,5 @@ inline const std::unordered_map<int, std::vector<QmTimelineItem::PropertyBuddy>>
 {
     return buddy_updators_;
 }
+
+} // namespace qmtl

@@ -4,6 +4,8 @@
 #include "qmtimelinetype.h"
 #include <memory>
 
+namespace qmtl {
+
 class QmTimelineItem;
 class QmTimelineItemView;
 class QmTimelineItemModel;
@@ -16,3 +18,5 @@ public:
 
     bool itemHasConnection(QmItemID item_id) const;
 };
+
+} // namespace qmtl

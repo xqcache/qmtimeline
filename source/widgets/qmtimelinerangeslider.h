@@ -4,6 +4,8 @@
 #include "qmtimelinetype.h"
 #include <QWidget>
 
+namespace qmtl {
+
 struct QmTimelineRangeSliderPrivate;
 class QMTIMELINE_LIB_EXPORT QmTimelineRangeSlider : public QWidget {
     Q_OBJECT
@@ -81,3 +83,5 @@ private:
 private:
     QmTimelineRangeSliderPrivate* d_ { nullptr };
 };
+
+} // namespace qmtl

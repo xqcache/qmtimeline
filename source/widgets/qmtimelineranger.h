@@ -8,6 +8,8 @@ namespace Ui {
 class QmTimelineRanger;
 }
 
+namespace qmtl {
+
 class QmTimelineRangeSlider;
 
 struct QmTimelineRangerPrivate;
@@ -38,3 +40,4 @@ private:
     Ui::QmTimelineRanger* ui_ { nullptr };
     QmTimelineRangerPrivate* d_ { nullptr };
 };
+} // namespace qmtl

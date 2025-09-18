@@ -4,6 +4,8 @@
 #include "qmtimelinetype.h"
 #include <QWidget>
 
+namespace qmtl {
+
 class QmTimelineView;
 struct QmTimelineAxisPrivate;
 
@@ -67,3 +69,4 @@ private:
 private:
     QmTimelineAxisPrivate* d_ { nullptr };
 };
+} // namespace qmtl

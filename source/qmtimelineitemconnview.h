@@ -4,6 +4,8 @@
 #include <QFontMetricsF>
 #include <QGraphicsObject>
 
+namespace qmtl {
+
 class QmTimelineScene;
 class QmTimelineItemConnView : public QGraphicsObject {
     Q_OBJECT
@@ -33,3 +35,5 @@ private:
     QmTimelineScene& scene_;
     QFontMetricsF font_metrics_;
 };
+
+} // namespace qmtl

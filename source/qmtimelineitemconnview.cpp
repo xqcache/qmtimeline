@@ -9,6 +9,8 @@
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
 
+namespace qmtl {
+
 QmTimelineItemConnView::QmTimelineItemConnView(const QmItemConnID& conn_id, QmTimelineScene& scene)
     : conn_id_(conn_id)
     , scene_(scene)
@@ -192,3 +194,5 @@ void QmTimelineItemConnView::updateGeometry()
     prepareGeometryChange();
     update();
 }
+
+} // namespace qmtl

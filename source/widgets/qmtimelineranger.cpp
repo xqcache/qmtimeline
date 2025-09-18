@@ -3,6 +3,8 @@
 #include <QIntValidator>
 #include <QRegularExpressionValidator>
 
+namespace qmtl {
+
 struct QmTimelineRangerPrivate {
 
     bool ignore_frame_range_signal = false;
@@ -189,3 +191,4 @@ double QmTimelineRanger::fps() const
 {
     return ui_->slider->fps();
 }
+} // namespace qmtl

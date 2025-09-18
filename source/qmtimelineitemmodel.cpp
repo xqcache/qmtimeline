@@ -5,18 +5,20 @@
 #include "qmtimelineutil.h"
 
 namespace nlohmann {
-void from_json(const nlohmann::json& j, QmItemConnID& conn_id)
+void from_json(const nlohmann::json& j, qmtl::QmItemConnID& conn_id)
 {
     conn_id.from = j[0];
     conn_id.to = j[1];
 }
 
-void to_json(nlohmann::json& j, const QmItemConnID& conn_id)
+void to_json(nlohmann::json& j, const qmtl::QmItemConnID& conn_id)
 {
     j.emplace_back(conn_id.from);
     j.emplace_back(conn_id.to);
 }
 } // namespace nlohmann
+
+namespace qmtl {
 
 struct QmTimelineItemModelPrivate {
     std::map<QmItemID, std::unique_ptr<QmTimelineItem>> items;
@@ -1050,3 +1052,4 @@ void QmTimelineItemModel::notifyLanguageChanged()
         emit itemChanged(item_id, QmTimelineItem::ToolTipRole);
     }
 }
+} // namespace qmtl

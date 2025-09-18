@@ -5,6 +5,8 @@
 #include "qmtimelineitemview.h"
 #include "qmtimelinelog.h"
 
+namespace qmtl {
+
 std::unique_ptr<QmTimelineItem> QmTimelineItemFactory::createItem(QmItemID item_id, QmTimelineItemModel* model) const
 {
     int item_type = QmTimelineItemModel::itemType(item_id);
@@ -31,3 +33,5 @@ bool QmTimelineItemFactory::itemHasConnection(QmItemID item_id) const
 {
     return true;
 }
+
+} // namespace qmtl

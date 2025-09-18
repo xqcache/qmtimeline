@@ -4,6 +4,8 @@
 #include <limits>
 #include <qtypes.h>
 
+namespace qmtl {
+
 using QmItemID = quint64;
 constexpr QmItemID kInvalidItemID = std::numeric_limits<QmItemID>::max();
 
@@ -36,3 +38,5 @@ enum class QmFrameFormat {
     TimeCode,
     TimeString,
 };
+
+} // namespace qmtl

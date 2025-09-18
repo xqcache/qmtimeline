@@ -6,6 +6,9 @@
 
 class QUndoCommand;
 class QUndoStack;
+
+namespace qmtl {
+
 class QmTimelineView;
 class QmTimelineItemModel;
 class QmTimelineItemView;
@@ -34,6 +37,7 @@ public:
     QList<QmItemID> selectedItems() const;
 
     void fitInAxis();
+
     void refreshCache();
     void undo();
     void redo();
@@ -67,3 +71,4 @@ private:
 private:
     QmTimelineScenePrivate* d_ { nullptr };
 };
+} // namespace qmtl

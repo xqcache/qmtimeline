@@ -4,6 +4,8 @@
 #include "qmtimelinetype.h"
 #include <QGraphicsObject>
 
+namespace qmtl {
+
 class QmTimelineScene;
 class QmTimelineItemModel;
 class QMTIMELINE_LIB_EXPORT QmTimelineItemView : public QGraphicsObject {
@@ -58,3 +60,5 @@ inline QmItemID QmTimelineItemView::itemId() const
 {
     return item_id_;
 }
+
+} // namespace qmtl

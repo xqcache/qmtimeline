@@ -6,6 +6,8 @@
 #include "widgets/qmtimelinerangeslider.h"
 #include <QMouseEvent>
 
+namespace qmtl {
+
 struct QmTimelineViewPrivate {
     QWidget* vbar_filler { nullptr };
     QmTimelineAxis* axis { nullptr };
@@ -265,3 +267,5 @@ qreal QmTimelineView::axisFrameWidth() const
 {
     return d_->axis->frameWidth();
 }
+
+} // namespace qmtl

@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QVariant>
 
+namespace qmtl {
+
 class QmTimelineItem;
 class QmTimelineItemFactory;
 struct QmTimelineItemModelPrivate;
@@ -161,3 +163,5 @@ inline constexpr QmItemID QmTimelineItemModel::makeItemID(int item_type, int ite
 {
     return ((static_cast<QmItemID>(item_type) & 0x7F) << 56) | ((static_cast<QmItemID>(item_row) & 0xFF) << 48) | ((id_index << 16) >> 16);
 }
+
+} // namespace qmtl

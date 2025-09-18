@@ -2,6 +2,8 @@
 #include <QGuiApplication>
 #include <QStringList>
 
+namespace qmtl {
+
 QString QmTimelineUtil::formatTimeCode(qint64 value, double fps)
 {
     qint64 sces = value / qRound64(fps);
@@ -93,3 +95,5 @@ qint64 QmTimelineUtil::frameToTime(qint64 frame_no, double fps)
 {
     return qRound64(static_cast<qreal>(frame_no) / fps * 1000.0);
 }
+
+} // namespace qmtl

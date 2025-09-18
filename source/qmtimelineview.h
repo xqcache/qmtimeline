@@ -4,6 +4,8 @@
 #include "qmtimelinetype.h"
 #include <QGraphicsView>
 
+namespace qmtl {
+
 class QmTimelineScene;
 class QmTimelineItemModel;
 struct QmTimelineViewPrivate;
@@ -49,3 +51,5 @@ private:
 private:
     QmTimelineViewPrivate* d_ { nullptr };
 };
+
+} // namespace qmtl

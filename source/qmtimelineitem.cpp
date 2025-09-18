@@ -3,6 +3,8 @@
 #include "qmtimelinelog.h"
 #include <QCoreApplication>
 
+namespace qmtl {
+
 QmTimelineItem::QmTimelineItem(QmItemID item_id, QmTimelineItemModel* model)
     : model_(model)
     , item_id_(item_id)
@@ -226,3 +228,5 @@ void from_json(const nlohmann::json& j, QmTimelineItem& item)
     j["start"].get_to<qint64>(item.start_);
     j["duration"].get_to<qint64>(item.duration_);
 }
+
+} // namespace qmtl

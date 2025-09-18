@@ -6,6 +6,8 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 
+namespace qmtl {
+
 QmTimelineItemView::QmTimelineItemView(QmItemID item_id, QmTimelineScene* scene)
     : item_id_(item_id)
 {
@@ -214,3 +216,5 @@ void QmTimelineItemView::refreshCache()
 void QmTimelineItemView::rebuildCache()
 {
 }
+
+} // namespace qmtl

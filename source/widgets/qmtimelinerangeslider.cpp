@@ -13,7 +13,7 @@ struct QmTimelineRangeSliderPrivate {
     std::array<bool, 3> pressed { false, false, false };
     std::array<qint64, 2> view_range { 0, 1 };
     std::array<qint64, 2> frame_range { 0, 1 };
-    bool frame_mode { false };
+    QmFrameFormat frame_fmt { QmFrameFormat::TimeCode };
     bool range_changed { false };
 };
 
@@ -32,7 +32,7 @@ QmTimelineRangeSlider::~QmTimelineRangeSlider() noexcept
 
 QSize QmTimelineRangeSlider::minimumSizeHint() const
 {
-    return QSize(d_->frame_mode ? 100 : 250, 20 + d_->margins.top() + d_->margins.bottom());
+    return QSize(d_->frame_fmt == QmFrameFormat::Frame ? 100 : 250, 20 + d_->margins.top() + d_->margins.bottom());
 }
 
 void QmTimelineRangeSlider::initUi()
@@ -332,19 +332,31 @@ void QmTimelineRangeSlider::setFrameMinimum(qint64 minimum)
 
 void QmTimelineRangeSlider::setFrameMaximum(const QString& text)
 {
-    if (d_->frame_mode) {
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame:
         setFrameMaximum(text.toLongLong());
-    } else {
+    case QmFrameFormat::TimeCode:
         setFrameMaximum(QmTimelineUtil::parseTimeCode(text, d_->fps));
+    case QmFrameFormat::TimeString:
+        setFrameMaximum(QmTimelineUtil::parseTimeString(text, d_->fps, false));
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
 }
 
 void QmTimelineRangeSlider::setFrameMinimum(const QString& text)
 {
-    if (d_->frame_mode) {
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame:
         setFrameMinimum(text.toLongLong());
-    } else {
+    case QmFrameFormat::TimeCode:
         setFrameMinimum(QmTimelineUtil::parseTimeCode(text, d_->fps));
+    case QmFrameFormat::TimeString:
+        setFrameMinimum(QmTimelineUtil::parseTimeString(text, d_->fps, false));
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
 }
 
@@ -362,18 +374,20 @@ double QmTimelineRangeSlider::fps() const
     return d_->fps;
 }
 
-bool QmTimelineRangeSlider::isFrameMode() const
-{
-    return d_->frame_mode;
-}
-
 QString QmTimelineRangeSlider::valueToText(qint64 value) const
 {
-    if (!d_->frame_mode) {
-        return QmTimelineUtil::formatTimeCode(value, d_->fps);
-    } else {
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame:
         return QString::number(value);
+    case QmFrameFormat::TimeCode:
+        return QmTimelineUtil::formatTimeCode(value, d_->fps);
+    case QmFrameFormat::TimeString:
+        return QmTimelineUtil::formatTimeString(value, d_->fps, false);
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
+    return "";
 }
 
 qint64 QmTimelineRangeSlider::viewFrameMinimum() const
@@ -439,12 +453,12 @@ int QmTimelineRangeSlider::viewRangeTextWidth(const QString& text) const
     return fontMetrics().horizontalAdvance(text);
 }
 
-void QmTimelineRangeSlider::setFrameMode(bool on)
+void QmTimelineRangeSlider::setFrameFormat(QmFrameFormat frame_fmt)
 {
-    if (d_->frame_mode == on) {
+    if (d_->frame_fmt == frame_fmt) {
         return;
     }
-    d_->frame_mode = on;
+    d_->frame_fmt = frame_fmt;
     update();
 }
 
@@ -471,36 +485,65 @@ QString QmTimelineRangeSlider::frameMinimumText() const
 bool QmTimelineRangeSlider::checkFrameMinimumValid(const QString& min_text) const
 {
     qint64 min_value = 0;
-    if (d_->frame_mode) {
+
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame: {
         bool ok = false;
         min_value = min_text.toLongLong(&ok);
         if (!ok || min_value < 0) {
             return false;
         }
-    } else {
+        break;
+    }
+    case QmFrameFormat::TimeCode: {
         min_value = QmTimelineUtil::parseTimeCode(min_text, d_->fps);
         if (min_value < 0) {
             return false;
         }
+    } break;
+    case QmFrameFormat::TimeString: {
+        min_value = QmTimelineUtil::parseTimeString(min_text, d_->fps, false);
+        if (min_value < 0) {
+            return false;
+        }
+    } break;
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
+
     return min_value < d_->frame_range[1];
 }
 
 bool QmTimelineRangeSlider::checkFrameMaximumValid(const QString& max_text) const
 {
     qint64 max_value = 0;
-    if (d_->frame_mode) {
+
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame: {
         bool ok = false;
         max_value = max_text.toLongLong(&ok);
         if (!ok || max_value < 0) {
             return false;
         }
-    } else {
+    } break;
+    case QmFrameFormat::TimeCode: {
         max_value = QmTimelineUtil::parseTimeCode(max_text, d_->fps);
         if (max_value < 0) {
             return false;
         }
+    } break;
+    case QmFrameFormat::TimeString: {
+        max_value = QmTimelineUtil::parseTimeString(max_text, d_->fps, false);
+        if (max_value < 0) {
+            return false;
+        }
+    } break;
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
+
     return max_value > d_->frame_range[0];
 }
 

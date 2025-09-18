@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmtimeline_global.h"
+#include "qmtimelinetype.h"
 #include <QWidget>
 
 struct QmTimelineRangeSliderPrivate;
@@ -24,9 +25,9 @@ public:
     void setViewFrameMinimum(qint64 minimum);
     void setViewFrameMaximum(qint64 maximum);
 
-    // 设置显示模式。true 为帧模式，false 为时间码模式。
-    void setFrameMode(bool on);
-    bool isFrameMode() const;
+    // 设置显示模式。
+    void setFrameFormat(QmFrameFormat frame_fmt);
+
     qint64 frameMaximum() const;
     qint64 frameMinimum() const;
     qint64 viewFrameMinimum() const;

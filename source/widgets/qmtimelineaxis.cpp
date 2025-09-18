@@ -24,7 +24,7 @@ struct QmTimelineAxisPrivate {
         int sub_ticks { 5 };
     } ruler;
 
-    bool frame_mode { false };
+    QmFrameFormat frame_fmt { QmFrameFormat::TimeCode };
     double fps { 24.0 };
 
     bool pressed { false };
@@ -262,7 +262,7 @@ qreal QmTimelineAxis::maxTickLabelWidth() const
 {
     const auto& font_metrics = fontMetrics();
     return qMax(font_metrics.horizontalAdvance(valueToText(d_->ruler.minimum)), font_metrics.horizontalAdvance(valueToText(d_->ruler.maximum)))
-        * (d_->frame_mode ? 1.7 : 1.3);
+        * (d_->frame_fmt == QmFrameFormat::Frame ? 1.7 : 1.3);
 }
 
 qreal QmTimelineAxis::tickCount() const
@@ -292,10 +292,18 @@ qint64 QmTimelineAxis::frameCount() const
 
 QString QmTimelineAxis::valueToText(qint64 value) const
 {
-    if (d_->frame_mode) {
+    switch (d_->frame_fmt) {
+    case QmFrameFormat::Frame:
         return QString::number(value);
+    case QmFrameFormat::TimeCode:
+        return QmTimelineUtil::formatTimeCode(value, d_->fps);
+    case QmFrameFormat::TimeString:
+        return QmTimelineUtil::formatTimeString(value, d_->fps);
+    default:
+        assert(0 && "Invalid format");
+        break;
     }
-    return QmTimelineUtil::formatTimeCode(value, d_->fps);
+    return "";
 }
 
 void QmTimelineAxis::setFps(qint64 fps)
@@ -304,16 +312,16 @@ void QmTimelineAxis::setFps(qint64 fps)
     update();
 }
 
-void QmTimelineAxis::setFrameMode(bool on)
+void QmTimelineAxis::setFrameFormat(QmFrameFormat frame_fmt)
 {
-    d_->frame_mode = on;
+    d_->frame_fmt = frame_fmt;
     updateTickWidth();
     update();
 }
 
-bool QmTimelineAxis::isFrameMode() const
+QmFrameFormat QmTimelineAxis::frameFormat() const
 {
-    return d_->frame_mode;
+    return d_->frame_fmt;
 }
 
 qint64 QmTimelineAxis::frame() const

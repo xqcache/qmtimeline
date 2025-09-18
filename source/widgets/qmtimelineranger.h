@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qmtimeline_global.h"
+#include "qmtimelinetype.h"
 #include <QWidget>
 
 namespace Ui {
@@ -20,7 +21,7 @@ public:
     QmTimelineRangeSlider* slider() const;
 
     // 以帧模式控制范围
-    void setFrameMode(bool on);
+    void setFrameFormat(QmFrameFormat frame_fmt);
     void setFrameMinimum(qint64 minimum);
     void setFrameMaximum(qint64 maximum);
     void setFps(double fps);

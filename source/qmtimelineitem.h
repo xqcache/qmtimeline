@@ -101,7 +101,7 @@ protected:
 
     virtual void updateBuddyProperty(int role, const QVariant& param);
 
-    void notifyPropertyChanged(int role);
+    void notifyPropertyChanged(int role, const QVariant& old_value = QVariant());
     void blockBuddyUpdate(int role);
     void unblockBuddyUpdate(int role);
 

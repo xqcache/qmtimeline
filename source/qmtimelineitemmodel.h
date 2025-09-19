@@ -96,7 +96,7 @@ public:
     QmItemID nextItem(QmItemID item_id) const;
     std::map<qint64, QmItemID> rowItems(int row) const;
 
-    void notifyItemPropertyChanged(QmItemID item_id, int role);
+    void notifyItemPropertyChanged(QmItemID item_id, int role, const QVariant& old_val = QVariant());
     void notifyItemOperateFinished(QmItemID item_id, int op_role, const QVariant& param = QVariant());
 
     bool load(const nlohmann::json& j) override;
@@ -111,7 +111,7 @@ signals:
     void itemCreated(QmItemID item_id);
     void itemAboutToBeRemoved(QmItemID item_id);
     void itemRemoved(QmItemID item_id);
-    void itemChanged(QmItemID item_id, int role);
+    void itemChanged(QmItemID item_id, int role, const QVariant& old_val = QVariant());
     void itemOperateFinished(QmItemID item_id, int op_role, const QVariant& param = QVariant());
 
     void itemConnCreated(const QmItemConnID& conn_id);

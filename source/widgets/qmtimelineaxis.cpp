@@ -239,10 +239,11 @@ void QmTimelineAxis::setMaximum(qint64 value)
     if (d_->ruler.maximum == value) {
         return;
     }
-
+    auto old_frame = frame();
     d_->ruler.maximum = value;
     updateTickWidth();
     update();
+    movePlayhead(old_frame);
 }
 
 void QmTimelineAxis::setMinimum(qint64 value)
@@ -250,9 +251,11 @@ void QmTimelineAxis::setMinimum(qint64 value)
     if (d_->ruler.minimum == value) {
         return;
     }
+    auto old_frame = frame();
     d_->ruler.minimum = value;
     updateTickWidth();
     update();
+    movePlayhead(old_frame);
 }
 
 qreal QmTimelineAxis::innerWidth() const

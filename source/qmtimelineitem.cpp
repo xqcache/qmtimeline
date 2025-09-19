@@ -31,9 +31,10 @@ void QmTimelineItem::setStart(qint64 frame_no)
     if (frame_no == start_) {
         return;
     }
+    int old_start = start_;
     start_ = frame_no;
     setDirty(true);
-    notifyPropertyChanged(StartRole | ToolTipRole);
+    notifyPropertyChanged(StartRole | ToolTipRole, old_start);
 }
 
 void QmTimelineItem::setDuration(qint64 frame_count)
@@ -200,9 +201,9 @@ nlohmann::json QmTimelineItem::save() const
     return j;
 }
 
-void QmTimelineItem::notifyPropertyChanged(int role)
+void QmTimelineItem::notifyPropertyChanged(int role, const QVariant& old_value)
 {
-    model_->notifyItemPropertyChanged(item_id_, role);
+    model_->notifyItemPropertyChanged(item_id_, role, old_value);
 }
 
 void QmTimelineItem::updateBuddyProperty(int role, const QVariant& param)

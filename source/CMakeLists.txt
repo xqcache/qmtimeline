@@ -41,6 +41,14 @@ else()
     set(_public_defines QMTIMELINE_BUILD_STATIC)
 endif()
 
+if(NOT TARGET spdlog)
+    message(FATAL_ERROR "=== FATAL ERROR: ${TARGET_NAME} requires spdlog. Please install spdlog.")
+endif()
+
+if(NOT TARGET nlohmann_json)
+    message(FATAL_ERROR "=== FATAL ERROR: ${TARGET_NAME} requires nlohmann_json. Please install nlohmann_json")
+endif()
+
 add_library(${TARGET_NAME} ${_library_type})
 
 set_target_properties(${TARGET_NAME} PROPERTIES DEBUG_POSTFIX "d")
@@ -56,7 +64,7 @@ add_subdirectory(widgets)
 
 if(QMTIMELINE_INSTALL)
     include(GNUInstallDirs)
-    install(TARGETS spdlog EXPORT ${TARGET_NAME}Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(TARGETS spdlog nlohmann_json EXPORT ${TARGET_NAME}Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
     install(TARGETS ${TARGET_NAME} EXPORT ${TARGET_NAME}Targets
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

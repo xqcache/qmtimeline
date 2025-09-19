@@ -618,12 +618,12 @@ std::map<qint64, QmItemID> QmTimelineItemModel::rowItems(int row) const
     return row_it->second;
 }
 
-void QmTimelineItemModel::notifyItemPropertyChanged(QmItemID item_id, int role)
+void QmTimelineItemModel::notifyItemPropertyChanged(QmItemID item_id, int role, const QVariant& old_value)
 {
     if (!d_->items.contains(item_id)) {
         return;
     }
-    emit itemChanged(item_id, role);
+    emit itemChanged(item_id, role, old_value);
 }
 
 void QmTimelineItemModel::notifyItemOperateFinished(QmItemID item_id, int op_role, const QVariant& param)

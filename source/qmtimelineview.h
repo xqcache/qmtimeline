@@ -22,6 +22,7 @@ public:
     void setSceneWidth(qreal width);
 
     qreal axisFrameWidth() const;
+    qint64 axisFrameNo() const;
     QmTimelineItemModel* model() const;
 
     void setFrameFormat(QmFrameFormat frame_fmt);

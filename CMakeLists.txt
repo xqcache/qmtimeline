@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.24.0 FATAL_ERROR)
 
 project(qmtimeline VERSION 0.0.1 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(MAIN_PROJECT OFF)
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
@@ -31,3 +34,12 @@ endif()
 
 add_subdirectory(thirdparty)
 add_subdirectory(source)
+
+if(QMTIMELINE_BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+    add_subdirectory(tests)
+endif()
+
+# 个人私有测试用例（不上代码库）
+if(MAIN_PROJECT AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/_tests")
+    add_subdirectory(_tests)
+endif()

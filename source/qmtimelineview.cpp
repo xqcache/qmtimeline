@@ -268,4 +268,9 @@ qreal QmTimelineView::axisFrameWidth() const
     return d_->axis->frameWidth();
 }
 
+qint64 QmTimelineView::axisFrameNo() const
+{
+    return d_->axis->frame();
+}
+
 } // namespace qmtl

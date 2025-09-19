@@ -49,8 +49,6 @@ public:
     bool requestItemOperate(QmItemID item_id, int op_role, const QVariant& param = QVariant());
     void notifyLanguageChanged();
 
-    QmTimelineItemFactory* itemFactory() const;
-
     void setTypeHidden(int row, int type, bool hidden);
     bool isTypeHidden(int type) const;
     void setTypeLocked(int type, bool locked);

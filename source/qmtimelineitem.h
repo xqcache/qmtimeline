@@ -106,7 +106,7 @@ protected:
     void unblockBuddyUpdate(int role);
 
 protected:
-    friend void from_json(const nlohmann::json& j, QmTimelineItem& item);
+    QMTIMELINE_LIB_EXPORT friend void from_json(const nlohmann::json& j, QmTimelineItem& item);
     QPalette palette_;
     // 数据部分
     int number_ { 0 };

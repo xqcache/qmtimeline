@@ -3,6 +3,7 @@
 #include "qmtimelineitemfactory.h"
 #include "qmtimelinelog.h"
 #include "qmtimelineutil.h"
+#include <set>
 
 namespace nlohmann {
 void from_json(const nlohmann::json& j, qmtl::QmItemConnID& conn_id)
@@ -37,7 +38,6 @@ struct QmTimelineItemModelPrivate {
     std::array<qint64, 2> view_frame_range { 0, 1 };
     double fps { 24.0 };
 
-    std::unique_ptr<QmTimelineItemFactory> item_factory;
     bool dirty { false };
     qreal item_height { 40 };
 };
@@ -46,7 +46,6 @@ QmTimelineItemModel::QmTimelineItemModel(QObject* parent)
     : QObject(parent)
     , d_(new QmTimelineItemModelPrivate)
 {
-    d_->item_factory = std::make_unique<QmTimelineItemFactory>();
 }
 
 QmTimelineItemModel::~QmTimelineItemModel() noexcept
@@ -144,7 +143,7 @@ QmItemID QmTimelineItemModel::createItem(int item_type, int row, qint64 start, q
 
     // 构造item_id
     QmItemID item_id = makeItemID(item_type, row, d_->id_index);
-    auto item = d_->item_factory->createItem(item_id, this);
+    auto item = QmTimelineItemFactory::instance().createItem(item_id, this);
     if (!item) {
         return kInvalidItemID;
     }
@@ -299,7 +298,7 @@ QmItemConnID QmTimelineItemModel::nextConnection(QmItemID item_id) const
 
 bool QmTimelineItemModel::hasConnection(QmItemID item_id) const
 {
-    return d_->item_factory->itemHasConnection(item_id);
+    return QmTimelineItemFactory::instance().itemHasConnection(item_id);
 }
 
 QmItemConnID QmTimelineItemModel::createFrameConnection(QmItemID from, QmItemID to)
@@ -376,11 +375,6 @@ bool QmTimelineItemModel::requestItemOperate(QmItemID item_id, int op_role, cons
         return {};
     }
     return item->operate(op_role, param);
-}
-
-QmTimelineItemFactory* QmTimelineItemModel::itemFactory() const
-{
-    return d_->item_factory.get();
 }
 
 void QmTimelineItemModel::setTypeHidden(int row, int type, bool hidden)
@@ -891,7 +885,7 @@ void QmTimelineItemModel::loadItem(const nlohmann::json& j, const std::optional<
     }
 
     int row = itemRow(item_id);
-    auto item = itemFactory()->createItem(item_id, this);
+    auto item = QmTimelineItemFactory::instance().createItem(item_id, this);
     if (!item) {
         throw std::exception(std::format("create item[{}] failed!", item_id).c_str());
     }
@@ -999,7 +993,7 @@ void from_json(const nlohmann::json& j, QmTimelineItemModel& model)
     nlohmann::json items_j = j["items"];
     for (const auto& item_j : items_j) {
         QmItemID item_id = item_j["id"];
-        auto item = model.itemFactory()->createItem(item_id, &model);
+        auto item = QmTimelineItemFactory::instance().createItem(item_id, &model);
         if (!item) {
             throw std::exception(std::format("create item[{}] failed!", item_id).c_str());
         }

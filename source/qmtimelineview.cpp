@@ -232,9 +232,6 @@ void QmTimelineView::drawBackground(QPainter* painter, const QRectF& rect)
 {
     QGraphicsView::drawBackground(painter, rect);
     painter->fillRect(rect, backgroundBrush());
-
-    painter->setBrush(Qt::red);
-    painter->drawEllipse(0, 0, 10, 10);
 }
 
 qreal QmTimelineView::mapFromSceneX(qreal x) const

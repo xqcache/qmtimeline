@@ -36,6 +36,7 @@ void QmTimelineRanger::initUi()
     ui_->combo_fps->addItem("60 fps", 60.0);
 
     setFps(ui_->combo_fps->itemData(ui_->combo_fps->currentIndex()).toDouble());
+    setFrameFormat(qmtl::QmFrameFormat::TimeCode);
 }
 
 void QmTimelineRanger::setupSignals()

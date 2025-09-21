@@ -49,12 +49,12 @@ public:
     bool requestItemOperate(QmItemID item_id, int op_role, const QVariant& param = QVariant());
     void notifyLanguageChanged();
 
-    void setTypeHidden(int row, int type, bool hidden);
-    bool isTypeHidden(int type) const;
-    void setTypeLocked(int type, bool locked);
-    bool isTypeLocked(int type) const;
-    void setTypeDisabled(int type, bool disabled);
-    bool isTypeDisabled(int type) const;
+    void setRowHidden(int row, bool hidden);
+    bool isRowHidden(int type) const;
+    void setRowLocked(int type, bool locked);
+    bool isRowLocked(int type) const;
+    void setRowDisabled(int type, bool disabled);
+    bool isRowDisabled(int type) const;
 
     bool isItemHidden(QmItemID item_id) const;
     bool isItemLocked(QmItemID item_id) const;

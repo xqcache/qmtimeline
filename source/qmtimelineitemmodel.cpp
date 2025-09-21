@@ -27,9 +27,9 @@ struct QmTimelineItemModelPrivate {
     std::map<int, std::map<qint64, QmItemID>> item_table;
     // {row: {item_id: start}}
     std::map<int, std::unordered_map<QmItemID, qint64>> item_table_helper;
-    std::set<int> hidden_types;
-    std::set<int> locked_types;
-    std::set<int> disabled_types;
+    std::set<int> hidden_rows;
+    std::set<int> locked_rows;
+    std::set<int> disabled_rows;
     std::map<QmItemID, QmItemConnID> next_conns;
     std::map<QmItemID, QmItemConnID> prev_conns;
     int row_count { 1 };
@@ -377,18 +377,18 @@ bool QmTimelineItemModel::requestItemOperate(QmItemID item_id, int op_role, cons
     return item->operate(op_role, param);
 }
 
-void QmTimelineItemModel::setTypeHidden(int row, int type, bool hidden)
+void QmTimelineItemModel::setRowHidden(int row, bool hidden)
 {
     if (hidden) {
-        if (d_->hidden_types.contains(type)) {
+        if (d_->hidden_rows.contains(row)) {
             return;
         }
-        d_->hidden_types.emplace(type);
+        d_->hidden_rows.emplace(row);
     } else {
-        if (!d_->hidden_types.contains(type)) {
+        if (!d_->hidden_rows.contains(row)) {
             return;
         }
-        d_->hidden_types.erase(type);
+        d_->hidden_rows.erase(row);
     }
 
     auto it = d_->item_table.find(row);
@@ -419,9 +419,9 @@ void QmTimelineItemModel::resetDirty()
     std::for_each(d_->items.begin(), d_->items.end(), [](const auto& pair) { pair.second->resetDirty(); });
 }
 
-bool QmTimelineItemModel::isTypeHidden(int type) const
+bool QmTimelineItemModel::isRowHidden(int row) const
 {
-    return d_->hidden_types.contains(type);
+    return d_->hidden_rows.contains(row);
 }
 
 bool QmTimelineItemModel::isItemHidden(QmItemID item_id) const
@@ -429,22 +429,22 @@ bool QmTimelineItemModel::isItemHidden(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return d_->hidden_types.contains(itemType(item_id));
+    return d_->hidden_rows.contains(itemRow(item_id));
 }
 
-void QmTimelineItemModel::setTypeLocked(int type, bool locked)
+void QmTimelineItemModel::setRowLocked(int type, bool locked)
 {
     if (locked) {
-        d_->locked_types.emplace(type);
+        d_->locked_rows.emplace(type);
     } else {
-        d_->locked_types.erase(type);
+        d_->locked_rows.erase(type);
     }
     setDirty();
 }
 
-bool QmTimelineItemModel::isTypeLocked(int type) const
+bool QmTimelineItemModel::isRowLocked(int row) const
 {
-    return d_->locked_types.contains(type);
+    return d_->locked_rows.contains(row);
 }
 
 bool QmTimelineItemModel::isItemLocked(QmItemID item_id) const
@@ -452,12 +452,12 @@ bool QmTimelineItemModel::isItemLocked(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return isTypeLocked(itemType(item_id));
+    return isRowLocked(itemRow(item_id));
 }
 
-bool QmTimelineItemModel::isTypeDisabled(int type) const
+bool QmTimelineItemModel::isRowDisabled(int row) const
 {
-    return d_->disabled_types.contains(type);
+    return d_->disabled_rows.contains(row);
 }
 
 bool QmTimelineItemModel::isItemDisabled(QmItemID item_id) const
@@ -465,15 +465,15 @@ bool QmTimelineItemModel::isItemDisabled(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return isTypeDisabled(itemType(item_id));
+    return isRowDisabled(itemRow(item_id));
 }
 
-void QmTimelineItemModel::setTypeDisabled(int type, bool disabled)
+void QmTimelineItemModel::setRowDisabled(int row, bool disabled)
 {
     if (disabled) {
-        d_->disabled_types.emplace(type);
+        d_->disabled_rows.emplace(row);
     } else {
-        d_->disabled_types.erase(type);
+        d_->disabled_rows.erase(row);
     }
     setDirty();
 }
@@ -519,11 +519,11 @@ qreal QmTimelineItemModel::itemY(QmItemID item_id) const
     if (item_row < 0 || item_row >= d_->row_count) {
         return -2 * d_->item_height;
     }
-    if (isTypeHidden(itemType(item_id))) {
+    if (isRowHidden(item_row)) {
         return -2 * d_->item_height;
     }
 
-    int hidden_count = std::distance(d_->hidden_types.begin(), d_->hidden_types.lower_bound(item_row));
+    int hidden_count = std::distance(d_->hidden_rows.begin(), d_->hidden_rows.lower_bound(item_row));
     return (item_row - hidden_count) * d_->item_height;
 }
 
@@ -783,9 +783,9 @@ void QmTimelineItemModel::clear()
     }
     d_->id_index = 0;
     d_->dirty = false;
-    d_->hidden_types.clear();
-    d_->locked_types.clear();
-    d_->disabled_types.clear();
+    d_->hidden_rows.clear();
+    d_->locked_rows.clear();
+    d_->disabled_rows.clear();
 }
 
 qint64 QmTimelineItemModel::frameToTime(qint64 frame_no) const
@@ -813,9 +813,9 @@ nlohmann::json QmTimelineItemModel::save() const
     j["row_count"] = d_->row_count;
     j["item_table"] = d_->item_table;
     j["item_table_helper"] = d_->item_table_helper;
-    j["hidden_rows"] = d_->hidden_types;
-    j["locked_rows"] = d_->locked_types;
-    j["disabled_rows"] = d_->disabled_types;
+    j["hidden_rows"] = d_->hidden_rows;
+    j["locked_rows"] = d_->locked_rows;
+    j["disabled_rows"] = d_->disabled_rows;
     j["frame_range"] = d_->frame_range;
     j["view_frame_range"] = d_->view_frame_range;
 
@@ -982,10 +982,10 @@ void from_json(const nlohmann::json& j, QmTimelineItemModel& model)
     j["row_count"].get_to(model.d_->row_count);
     j["item_table"].get_to(model.d_->item_table);
     j["item_table_helper"].get_to(model.d_->item_table_helper);
-    j["hidden_rows"].get_to(model.d_->hidden_types);
-    j["locked_rows"].get_to(model.d_->locked_types);
+    j["hidden_rows"].get_to(model.d_->hidden_rows);
+    j["locked_rows"].get_to(model.d_->locked_rows);
     if (j.contains("disabled_rows")) {
-        j["disabled_rows"].get_to(model.d_->disabled_types);
+        j["disabled_rows"].get_to(model.d_->disabled_rows);
     }
     j["frame_range"].get_to(model.d_->frame_range);
     j["view_frame_range"].get_to(model.d_->view_frame_range);

@@ -337,10 +337,13 @@ void QmTimelineRangeSlider::setFrameMaximum(const QString& text)
     switch (d_->frame_fmt) {
     case QmFrameFormat::Frame:
         setFrameMaximum(text.toLongLong());
+        break;
     case QmFrameFormat::TimeCode:
         setFrameMaximum(QmTimelineUtil::parseTimeCode(text, d_->fps));
+        break;
     case QmFrameFormat::TimeString:
         setFrameMaximum(QmTimelineUtil::parseTimeString(text, d_->fps, false));
+        break;
     default:
         assert(0 && "Invalid format");
         break;
@@ -352,10 +355,13 @@ void QmTimelineRangeSlider::setFrameMinimum(const QString& text)
     switch (d_->frame_fmt) {
     case QmFrameFormat::Frame:
         setFrameMinimum(text.toLongLong());
+        break;
     case QmFrameFormat::TimeCode:
         setFrameMinimum(QmTimelineUtil::parseTimeCode(text, d_->fps));
+        break;
     case QmFrameFormat::TimeString:
         setFrameMinimum(QmTimelineUtil::parseTimeString(text, d_->fps, false));
+        break;
     default:
         assert(0 && "Invalid format");
         break;

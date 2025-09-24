@@ -108,6 +108,7 @@ public:
     QmItemID pasteItem(const QString& data, qint64 frame_no);
 
 signals:
+    void itemAboutToBeCreated(QmTimelineItem* item);
     void itemCreated(QmItemID item_id);
     void itemAboutToBeRemoved(QmItemID item_id);
     void itemRemoved(QmItemID item_id);

@@ -177,6 +177,7 @@ QmItemID QmTimelineItemModel::createItem(int item_type, int row, qint64 start, q
     item->setNumber(number_opt.value_or(d_->item_table[row].size() + 1));
     item->setStart(start);
     item->setDuration(duration);
+    emit itemAboutToBeCreated(item.get());
 
     // 登记item
     d_->id_index++;
@@ -928,6 +929,7 @@ void QmTimelineItemModel::loadItem(const nlohmann::json& j, const std::optional<
     }
 
     item->setNumber(number_opt.value_or(d_->item_table[row].size() + 1));
+    emit itemAboutToBeCreated(item.get());
     // 登记item
     d_->dirty = true;
     d_->item_table[row][item->start()] = item_id;

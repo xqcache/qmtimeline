@@ -12,6 +12,13 @@ struct QmTimelineAxisPrivate;
 class QMTIMELINE_LIB_EXPORT QmTimelineAxis : public QWidget {
     Q_OBJECT
 public:
+    enum Feature {
+        // 当范围发生变化后恢复播头的位置
+        KeepPlayheadPos = 0x01,
+    };
+    Q_ENUM(Feature)
+    Q_DECLARE_FLAGS(Features, Feature)
+
     explicit QmTimelineAxis(QmTimelineView* view);
     ~QmTimelineAxis() noexcept override;
 
@@ -33,6 +40,9 @@ public:
     qreal mapFrameToAxis(qint64 frame_count) const;
     qreal mapFrameToAxisX(qint64 frame_no) const;
     void movePlayhead(qint64 frame_no);
+
+    void setFeature(Feature feature, bool on = true);
+    void setFeatures(Features features);
 
 signals:
     void playheadPressed(qint64 frame_no);
@@ -69,4 +79,7 @@ private:
 private:
     QmTimelineAxisPrivate* d_ { nullptr };
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QmTimelineAxis::Features)
+
 } // namespace qmtl

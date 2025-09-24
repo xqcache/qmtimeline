@@ -34,9 +34,13 @@ public:
 
     bool isInView(qreal x, qreal width) const;
 
+    void setViewMinimumInterval(qint64 interval);
+    void setKeepPlayheadPos(bool on);
+
 protected:
     bool event(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
+    void wheelEvent(QWheelEvent* event) override;
     void drawBackground(QPainter* painter, const QRectF& rect) override;
 
 private:

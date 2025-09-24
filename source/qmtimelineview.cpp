@@ -73,7 +73,8 @@ bool QmTimelineView::event(QEvent* event)
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
     case QEvent::MouseMove:
-    case QEvent::MouseButtonDblClick: {
+    case QEvent::MouseButtonDblClick:
+    case QEvent::Wheel: {
         return viewportEvent(event);
     } break;
     case QEvent::ContextMenu: {
@@ -101,6 +102,19 @@ void QmTimelineView::resizeEvent(QResizeEvent* event)
 
     if (d_->scene) {
         d_->scene->fitInAxis();
+    }
+}
+
+void QmTimelineView::wheelEvent(QWheelEvent* event)
+{
+    qint64 step = 1;
+    if (auto* item_model = model(); item_model) {
+        step = qMax(1, (item_model->frameMaximum() - item_model->frameMinimum()) / 100);
+    }
+    if (event->angleDelta().y() > 0) {
+        d_->ranger->slider()->zoomIn(step);
+    } else {
+        d_->ranger->slider()->zoomOut(step);
     }
 }
 
@@ -258,6 +272,16 @@ bool QmTimelineView::isInView(qreal x, qreal width) const
 {
     qreal view_x = mapFromSceneX(x);
     return view_x >= 0 && view_x + width <= this->width();
+}
+
+void QmTimelineView::setViewMinimumInterval(qint64 interval)
+{
+    d_->ranger->slider()->setViewMinimumInterval(interval);
+}
+
+void QmTimelineView::setKeepPlayheadPos(bool on)
+{
+    d_->axis->setFeature(QmTimelineAxis::KeepPlayheadPos);
 }
 
 qreal QmTimelineView::axisFrameWidth() const

@@ -26,6 +26,7 @@ public:
     void setFrameMinimum(const QString& text);
     void setViewFrameMinimum(qint64 minimum);
     void setViewFrameMaximum(qint64 maximum);
+    void setViewMinimumInterval(qint64 interval);
 
     // 设置显示模式。
     void setFrameFormat(QmFrameFormat frame_fmt);
@@ -42,6 +43,9 @@ public:
     QString frameMinimumText() const;
 
     QString valueToText(qint64 value) const;
+
+    void zoomIn(qint64 step = 1);
+    void zoomOut(qint64 step = 1);
 
 signals:
     void viewMinimumChanged(qint64 value);

@@ -16,6 +16,8 @@ struct QmTimelineRangeSliderPrivate {
     std::array<qint64, 2> view_range { 0, 1 };
     std::array<qint64, 2> frame_range { 0, 1 };
     QmFrameFormat frame_fmt { QmFrameFormat::TimeCode };
+    // 最小间距
+    qint64 view_minimum_interval { 50 };
     bool range_changed { false };
 };
 
@@ -180,13 +182,13 @@ void QmTimelineRangeSlider::mouseMoveEvent(QMouseEvent* event)
     } else if (d_->pressed[0]) {
         qreal x = pos.x() - d_->margins.left() - d_->handle_width / 2.0;
         qint64 min_v = qMax(d_->frame_range[0], qRound64(x / deltaX()) + d_->frame_range[0]);
-        min_v = qMin(min_v, d_->view_range[1] - 1);
-        setViewMinimum(min_v);
+        min_v = qMin(min_v, d_->view_range[1] - d_->view_minimum_interval);
+        setViewMinimum(qMax(min_v, d_->frame_range[0]));
     } else if (d_->pressed[2]) {
         qreal x = pos.x() - d_->margins.left() - d_->handle_width * 3 - d_->handle_width / 2.0;
         qint64 max_v = qMin(d_->frame_range[1], qRound64(x / deltaX()) + d_->frame_range[0]);
-        max_v = qMax(max_v, d_->view_range[0] + 1);
-        setViewMaximum(max_v);
+        max_v = qMax(max_v, d_->view_range[0] + d_->view_minimum_interval);
+        setViewMaximum(qMin(max_v, d_->frame_range[1]));
     }
 
     update();
@@ -377,6 +379,11 @@ void QmTimelineRangeSlider::setFps(double fps)
     update();
 }
 
+void QmTimelineRangeSlider::setViewMinimumInterval(qint64 interval)
+{
+    d_->view_minimum_interval = interval;
+}
+
 double QmTimelineRangeSlider::fps() const
 {
     return d_->fps;
@@ -396,6 +403,28 @@ QString QmTimelineRangeSlider::valueToText(qint64 value) const
         break;
     }
     return "";
+}
+
+void QmTimelineRangeSlider::zoomIn(qint64 step)
+{
+    qint64 min_v = d_->view_range[0] + step;
+    min_v = qMin(min_v, d_->view_range[1] - d_->view_minimum_interval);
+    setViewMinimum(qMax(min_v, d_->frame_range[0]));
+
+    qint64 max_v = d_->view_range[1] - step;
+    max_v = qMax(max_v, d_->view_range[0] + d_->view_minimum_interval);
+    setViewMaximum(qMin(max_v, d_->frame_range[1]));
+}
+
+void QmTimelineRangeSlider::zoomOut(qint64 step)
+{
+    qint64 min_v = d_->view_range[0] - step;
+    min_v = qMin(min_v, d_->view_range[1] - d_->view_minimum_interval);
+    setViewMinimum(qMax(min_v, d_->frame_range[0]));
+
+    qint64 max_v = d_->view_range[1] + step;
+    max_v = qMax(max_v, d_->view_range[0] + d_->view_minimum_interval);
+    setViewMaximum(qMin(max_v, d_->frame_range[1]));
 }
 
 qint64 QmTimelineRangeSlider::viewFrameMinimum() const
@@ -520,7 +549,7 @@ bool QmTimelineRangeSlider::checkFrameMinimumValid(const QString& min_text) cons
         break;
     }
 
-    return min_value < d_->frame_range[1];
+    return min_value <= d_->frame_range[1] - d_->view_minimum_interval;
 }
 
 bool QmTimelineRangeSlider::checkFrameMaximumValid(const QString& max_text) const
@@ -552,7 +581,7 @@ bool QmTimelineRangeSlider::checkFrameMaximumValid(const QString& max_text) cons
         break;
     }
 
-    return max_value > d_->frame_range[0];
+    return max_value >= d_->frame_range[0] + d_->view_minimum_interval;
 }
 
 qreal QmTimelineRangeSlider::deltaX() const

@@ -26,6 +26,8 @@ struct QmTimelineAxisPrivate {
         int sub_ticks { 5 };
     } ruler;
 
+    QmTimelineAxis::Features features;
+
     QmFrameFormat frame_fmt { QmFrameFormat::TimeCode };
     double fps { 24.0 };
 
@@ -239,11 +241,13 @@ void QmTimelineAxis::setMaximum(qint64 value)
     if (d_->ruler.maximum == value) {
         return;
     }
-    auto old_frame = frame();
+    auto recover_value = qScopeGuard([this, old_frame = frame()] { movePlayhead(old_frame); });
     d_->ruler.maximum = value;
     updateTickWidth();
     update();
-    movePlayhead(old_frame);
+    if (!d_->features.testFlag(KeepPlayheadPos)) {
+        recover_value.dismiss();
+    }
 }
 
 void QmTimelineAxis::setMinimum(qint64 value)
@@ -251,11 +255,13 @@ void QmTimelineAxis::setMinimum(qint64 value)
     if (d_->ruler.minimum == value) {
         return;
     }
-    auto old_frame = frame();
+    auto recover_value = qScopeGuard([this, old_frame = frame()] { movePlayhead(old_frame); });
     d_->ruler.minimum = value;
     updateTickWidth();
     update();
-    movePlayhead(old_frame);
+    if (!d_->features.testFlag(KeepPlayheadPos)) {
+        recover_value.dismiss();
+    }
 }
 
 qreal QmTimelineAxis::innerWidth() const
@@ -362,6 +368,23 @@ void QmTimelineAxis::movePlayhead(qint64 frame_no)
     }
     d_->playhead.x = x;
     update();
+}
+
+void QmTimelineAxis::setFeature(Feature feature, bool on)
+{
+    if (on) {
+        setFeatures(d_->features | feature);
+    } else {
+        setFeatures(d_->features & ~feature);
+    }
+}
+
+void QmTimelineAxis::setFeatures(Features features)
+{
+    if (features == d_->features) {
+        return;
+    }
+    d_->features = features;
 }
 
 } // namespace qmtl

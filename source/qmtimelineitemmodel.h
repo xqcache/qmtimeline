@@ -25,17 +25,17 @@ public:
     }
 
     QmTimelineItem* item(QmItemID item_id) const;
-    QmTimelineItem* itemByStart(int row, qint64 start) const;
-    QmItemID itemIdByStart(int row, qint64 start) const;
+    QmTimelineItem* itemByStart(int row_id, qint64 start) const;
+    QmItemID itemIdByStart(int row_id, qint64 start) const;
     bool exists(QmItemID item_id) const;
-    inline constexpr static int itemRow(QmItemID item_id);
+    inline constexpr static int itemRowId(QmItemID item_id);
     inline constexpr static int itemType(QmItemID item_id);
-    inline constexpr static QmItemID makeItemID(int item_type, int item_row, QmItemID id_index);
+    inline constexpr static QmItemID makeItemID(int item_type, int row_id, QmItemID id_index);
 
-    bool isFrameRangeOccupied(int row, qint64 start, qint64 duration, QmItemID except_item = kInvalidItemID) const;
+    bool isFrameRangeOccupied(int row_id, qint64 start, qint64 duration, QmItemID except_item = kInvalidItemID) const;
 
     void removeItem(QmItemID item_id);
-    QmItemID createItem(int item_type, int item_row, qint64 start, qint64 duration = 0, bool with_connection = false);
+    QmItemID createItem(int item_type, int row_id, qint64 start, qint64 duration = 0, bool with_connection = false);
     QmItemConnID createFrameConnection(QmItemID from, QmItemID to);
     QmItemConnID previousConnection(QmItemID item_id) const;
     QmItemConnID nextConnection(QmItemID item_id) const;
@@ -49,7 +49,7 @@ public:
     bool requestItemOperate(QmItemID item_id, int op_role, const QVariant& param = QVariant());
     void notifyLanguageChanged();
 
-    void setRowHidden(int row, bool hidden);
+    void setRowHidden(int row_id, bool hidden);
     bool isRowHidden(int type) const;
     void setRowLocked(int type, bool locked);
     bool isRowLocked(int type) const;
@@ -60,9 +60,7 @@ public:
     bool isItemLocked(QmItemID item_id) const;
     bool isItemDisabled(QmItemID item_id) const;
 
-    void setRowCount(int row_count);
-    int rowCount() const;
-    int rowItemCount(int row) const;
+    int rowItemCount(int row_id) const;
 
     void setFrameMaximum(qint64 maximum);
     void setFrameMinimum(qint64 minimum);
@@ -90,11 +88,11 @@ public:
 
     bool modifyItemStart(QmItemID item_id, qint64 start);
 
-    QmItemID headItem(int row) const;
-    QmItemID tailItem(int row) const;
+    QmItemID headItem(int row_id) const;
+    QmItemID tailItem(int row_id) const;
     QmItemID previousItem(QmItemID item_id) const;
     QmItemID nextItem(QmItemID item_id) const;
-    std::map<qint64, QmItemID> rowItems(int row) const;
+    std::map<qint64, QmItemID> rowItems(int row_id) const;
 
     void notifyItemPropertyChanged(QmItemID item_id, int role, const QVariant& old_val = QVariant());
     void notifyItemOperateFinished(QmItemID item_id, int op_role, const QVariant& param = QVariant());
@@ -121,7 +119,6 @@ signals:
     void requestRefreshItemViewCache(QmItemID item_id);
     void requestRebuildItemViewCache(QmItemID item_id);
 
-    void rowCountChanged(int row_count);
     void requestUpdateItemY(QmItemID item_id);
 
     void frameMaximumChanged(qint64 maximum);
@@ -148,7 +145,7 @@ private:
     QmTimelineItemModelPrivate* d_ { nullptr };
 };
 
-inline constexpr int QmTimelineItemModel::itemRow(QmItemID item_id)
+inline constexpr int QmTimelineItemModel::itemRowId(QmItemID item_id)
 {
     return (item_id >> 48) & 0xFF;
 }
@@ -158,9 +155,9 @@ inline constexpr int QmTimelineItemModel::itemType(QmItemID item_id)
     return (item_id >> 56) & 0x7F;
 }
 
-inline constexpr QmItemID QmTimelineItemModel::makeItemID(int item_type, int item_row, QmItemID id_index)
+inline constexpr QmItemID QmTimelineItemModel::makeItemID(int item_type, int row_id, QmItemID id_index)
 {
-    return ((static_cast<QmItemID>(item_type) & 0x7F) << 56) | ((static_cast<QmItemID>(item_row) & 0xFF) << 48) | ((id_index << 16) >> 16);
+    return ((static_cast<QmItemID>(item_type) & 0x7F) << 56) | ((static_cast<QmItemID>(row_id) & 0xFF) << 48) | ((id_index << 16) >> 16);
 }
 
 } // namespace qmtl

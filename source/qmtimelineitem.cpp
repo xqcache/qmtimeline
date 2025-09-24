@@ -80,7 +80,7 @@ bool QmTimelineItem::setProperty(int role, const QVariant& data)
     switch (role) {
     case StartRole: {
         qint64 start = data.value<qint64>();
-        if (model_->isFrameRangeOccupied(QmTimelineItemModel::itemRow(item_id_), start, duration_, item_id_)) {
+        if (model_->isFrameRangeOccupied(QmTimelineItemModel::itemRowId(item_id_), start, duration_, item_id_)) {
             QMTL_LOG_ERROR("This time range already occupied! start:{}, duration:{}", start, duration_);
             return false;
         }
@@ -92,7 +92,7 @@ bool QmTimelineItem::setProperty(int role, const QVariant& data)
     } break;
     case DurationRole: {
         qint64 duration = data.value<qint64>();
-        if (model_->isFrameRangeOccupied(QmTimelineItemModel::itemRow(item_id_), start_, duration, item_id_)) {
+        if (model_->isFrameRangeOccupied(QmTimelineItemModel::itemRowId(item_id_), start_, duration, item_id_)) {
             QMTL_LOG_ERROR("This time range already occupied! start:{}, duration:{}", start_, duration);
             return false;
         }

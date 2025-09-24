@@ -23,16 +23,15 @@ namespace qmtl {
 
 struct QmTimelineItemModelPrivate {
     std::map<QmItemID, std::unique_ptr<QmTimelineItem>> items;
-    // {row: {start: item_id}}
+    // {row_id: {start: item_id}}
     std::map<int, std::map<qint64, QmItemID>> item_table;
-    // {row: {item_id: start}}
+    // {row_id: {item_id: start}}
     std::map<int, std::unordered_map<QmItemID, qint64>> item_table_helper;
     std::set<int> hidden_rows;
     std::set<int> locked_rows;
     std::set<int> disabled_rows;
     std::map<QmItemID, QmItemConnID> next_conns;
     std::map<QmItemID, QmItemConnID> prev_conns;
-    int row_count { 1 };
     QmItemID id_index { 1 };
     std::array<qint64, 2> frame_range { 0, 1 };
     std::array<qint64, 2> view_frame_range { 0, 1 };
@@ -73,7 +72,7 @@ QmTimelineItem* QmTimelineItemModel::itemByStart(int row, qint64 start) const
 
 QmItemID QmTimelineItemModel::itemIdByStart(int row, qint64 start) const
 {
-    if (row < 0 || row >= d_->row_count) {
+    if (row < 0) {
         return kInvalidItemID;
     }
     auto it = d_->item_table[row].lower_bound(start);
@@ -131,8 +130,8 @@ bool QmTimelineItemModel::isFrameRangeOccupied(int row, qint64 start, qint64 dur
 
 QmItemID QmTimelineItemModel::createItem(int item_type, int row, qint64 start, qint64 duration, bool with_connection)
 {
-    if (row < 0 || row >= d_->row_count) {
-        QMTL_LOG_ERROR("Failed to create frame item. Invalid row[{}], it must between 0 and {}", row, d_->row_count);
+    if (row < 0) {
+        QMTL_LOG_ERROR("Failed to create frame item. Invalid row[{}]", row);
         return kInvalidItemID;
     }
 
@@ -223,8 +222,8 @@ void QmTimelineItemModel::removeItem(QmItemID item_id)
         return;
     }
     // 从item_sorts中删除item_id
-    int row = itemRow(item_id);
-    if (row < 0) {
+    int row_id = itemRowId(item_id);
+    if (row_id < 0) {
         return;
     }
 
@@ -236,9 +235,9 @@ void QmTimelineItemModel::removeItem(QmItemID item_id)
     QmItemID prev_item = previousItem(item_id);
     QmItemID next_item = nextItem(item_id);
 
-    if (item_id == tailItem(row)) {
+    if (item_id == tailItem(row_id)) {
         new_tail = prev_item;
-    } else if (item_id == headItem(row)) {
+    } else if (item_id == headItem(row_id)) {
         new_head = next_item;
     }
 
@@ -249,13 +248,13 @@ void QmTimelineItemModel::removeItem(QmItemID item_id)
         createFrameConnection(prev_item, next_item);
     }
 
-    if (auto helper_row_it = d_->item_table_helper.find(row); helper_row_it != d_->item_table_helper.end()) {
+    if (auto helper_row_it = d_->item_table_helper.find(row_id); helper_row_it != d_->item_table_helper.end()) {
         if (auto item_origin_it = helper_row_it->second.find(item_id); item_origin_it != helper_row_it->second.end()) {
             // 后续受影响的item序号需要重新设置
-            for (auto it = d_->item_table[row].upper_bound(item_origin_it->second); it != d_->item_table[row].end(); ++it) {
+            for (auto it = d_->item_table[row_id].upper_bound(item_origin_it->second); it != d_->item_table[row_id].end(); ++it) {
                 requestItemOperate(it->second, QmTimelineItem::OperationRole::OpDecreaseNumberRole, 1);
             }
-            if (auto row_it = d_->item_table.find(row); row_it != d_->item_table.end()) {
+            if (auto row_it = d_->item_table.find(row_id); row_it != d_->item_table.end()) {
                 if (auto origin_item_it = row_it->second.find(item_origin_it->second); origin_item_it != row_it->second.end()) {
                     row_it->second.erase(origin_item_it);
                     if (row_it->second.empty()) {
@@ -430,7 +429,7 @@ bool QmTimelineItemModel::isItemHidden(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return d_->hidden_rows.contains(itemRow(item_id));
+    return d_->hidden_rows.contains(itemRowId(item_id));
 }
 
 void QmTimelineItemModel::setRowLocked(int type, bool locked)
@@ -453,7 +452,7 @@ bool QmTimelineItemModel::isItemLocked(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return isRowLocked(itemRow(item_id));
+    return isRowLocked(itemRowId(item_id));
 }
 
 bool QmTimelineItemModel::isRowDisabled(int row) const
@@ -466,7 +465,7 @@ bool QmTimelineItemModel::isItemDisabled(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return true;
     }
-    return isRowDisabled(itemRow(item_id));
+    return isRowDisabled(itemRowId(item_id));
 }
 
 void QmTimelineItemModel::setRowDisabled(int row, bool disabled)
@@ -477,19 +476,6 @@ void QmTimelineItemModel::setRowDisabled(int row, bool disabled)
         d_->disabled_rows.erase(row);
     }
     setDirty();
-}
-void QmTimelineItemModel::setRowCount(int row_count)
-{
-    if (row_count == d_->row_count) {
-        return;
-    }
-    d_->row_count = row_count;
-    emit rowCountChanged(row_count);
-}
-
-int QmTimelineItemModel::rowCount() const
-{
-    return d_->row_count;
 }
 
 int QmTimelineItemModel::rowItemCount(int row) const
@@ -516,16 +502,20 @@ qreal QmTimelineItemModel::itemY(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return -2 * d_->item_height;
     }
-    int item_row = itemRow(item_id);
-    if (item_row < 0 || item_row >= d_->row_count) {
+    int row_id = itemRowId(item_id);
+    if (row_id < 0) {
         return -2 * d_->item_height;
     }
-    if (isRowHidden(item_row)) {
+    auto row_it = d_->item_table.find(row_id);
+    if (row_it == d_->item_table.end()) {
+        return -2 * d_->item_height;
+    }
+    if (isRowHidden(row_id)) {
         return -2 * d_->item_height;
     }
 
-    int hidden_count = std::distance(d_->hidden_rows.begin(), d_->hidden_rows.lower_bound(item_row));
-    return (item_row - hidden_count) * d_->item_height;
+    int hidden_count = std::distance(d_->hidden_rows.begin(), d_->hidden_rows.lower_bound(row_id));
+    return (std::distance(d_->item_table.begin(), row_it) - hidden_count) * d_->item_height;
 }
 
 QmItemID QmTimelineItemModel::headItem(int row) const
@@ -551,12 +541,12 @@ QmItemID QmTimelineItemModel::previousItem(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return kInvalidItemID;
     }
-    int row = itemRow(item_id);
-    if (row < 0) {
+    int row_id = itemRowId(item_id);
+    if (row_id < 0) {
         return kInvalidItemID;
     }
 
-    auto helper_row_it = d_->item_table_helper.find(row);
+    auto helper_row_it = d_->item_table_helper.find(row_id);
     if (helper_row_it == d_->item_table_helper.end()) {
         return kInvalidItemID;
     }
@@ -564,7 +554,7 @@ QmItemID QmTimelineItemModel::previousItem(QmItemID item_id) const
     if (start_it == helper_row_it->second.end()) {
         return kInvalidItemID;
     }
-    auto row_it = d_->item_table.find(row);
+    auto row_it = d_->item_table.find(row_id);
     if (row_it == d_->item_table.end()) {
         return kInvalidItemID;
     }
@@ -581,12 +571,12 @@ QmItemID QmTimelineItemModel::nextItem(QmItemID item_id) const
     if (item_id == kInvalidItemID) {
         return kInvalidItemID;
     }
-    int row = itemRow(item_id);
-    if (row < 0) {
+    int row_id = itemRowId(item_id);
+    if (row_id < 0) {
         return kInvalidItemID;
     }
 
-    auto helper_row_it = d_->item_table_helper.find(row);
+    auto helper_row_it = d_->item_table_helper.find(row_id);
     if (helper_row_it == d_->item_table_helper.end()) {
         return kInvalidItemID;
     }
@@ -594,7 +584,7 @@ QmItemID QmTimelineItemModel::nextItem(QmItemID item_id) const
     if (origin_it == helper_row_it->second.end()) {
         return kInvalidItemID;
     }
-    auto row_it = d_->item_table.find(row);
+    auto row_it = d_->item_table.find(row_id);
     if (row_it == d_->item_table.end()) {
         return kInvalidItemID;
     }
@@ -708,13 +698,13 @@ bool QmTimelineItemModel::modifyItemStart(QmItemID item_id, qint64 start)
         return false;
     }
 
-    int item_row = itemRow(item_id);
-    auto row_it = d_->item_table.find(item_row);
+    int row_id = itemRowId(item_id);
+    auto row_it = d_->item_table.find(row_id);
     if (row_it == d_->item_table.end()) [[unlikely]] {
         return false;
     }
 
-    auto helper_row_it = d_->item_table_helper.find(item_row);
+    auto helper_row_it = d_->item_table_helper.find(row_id);
     if (helper_row_it == d_->item_table_helper.end()) [[unlikely]] {
         return false;
     }
@@ -811,7 +801,6 @@ nlohmann::json QmTimelineItemModel::save() const
     nlohmann::json j;
 
     j["id_index"] = d_->id_index;
-    j["row_count"] = d_->row_count;
     j["item_table"] = d_->item_table;
     j["item_table_helper"] = d_->item_table_helper;
     j["hidden_rows"] = d_->hidden_rows;
@@ -864,10 +853,10 @@ QmItemID QmTimelineItemModel::pasteItem(const QString& data, qint64 frame_no)
         }
 
         auto old_item_id = j["id"].get<QmItemID>();
-        int row = itemRow(old_item_id);
+        int row_id = itemRowId(old_item_id);
         int type = itemType(old_item_id);
 
-        QmItemID item_id = makeItemID(type, row, d_->id_index);
+        QmItemID item_id = makeItemID(type, row_id, d_->id_index);
         loadItem(j, item_id, frame_no);
         ++d_->id_index;
         return item_id;
@@ -885,7 +874,7 @@ void QmTimelineItemModel::loadItem(const nlohmann::json& j, const std::optional<
         return;
     }
 
-    int row = itemRow(item_id);
+    int row_id = itemRowId(item_id);
     auto item = QmTimelineItemFactory::instance().createItem(item_id, this);
     if (!item) {
         throw std::exception(std::format("create item[{}] failed!", item_id).c_str());
@@ -898,16 +887,16 @@ void QmTimelineItemModel::loadItem(const nlohmann::json& j, const std::optional<
         item->setStart(*start);
     }
 
-    if (isFrameRangeOccupied(row, item->start(), item->duration())) {
+    if (isFrameRangeOccupied(row_id, item->start(), item->duration())) {
         emit errorOccurred(tr("Another frame already exists in the current location!"));
         throw std::exception(std::format("frame range is occupied!").c_str());
     }
 
     // 获取插入位置的item序号，同时修改插入位置之后的item序号
     std::optional<int> number_opt;
-    if (d_->item_table.contains(row)) {
+    if (d_->item_table.contains(row_id)) {
         // 插入位置之后的item对应编号加一
-        for (auto it = d_->item_table[row].upper_bound(item->start()); it != d_->item_table[row].end(); ++it) {
+        for (auto it = d_->item_table[row_id].upper_bound(item->start()); it != d_->item_table[row_id].end(); ++it) {
             if (!number_opt) {
                 auto item_number_opt = itemProperty(it->second, QmTimelineItem::NumberRole);
                 if (item_number_opt.has_value()) {
@@ -922,24 +911,24 @@ void QmTimelineItemModel::loadItem(const nlohmann::json& j, const std::optional<
     QmItemID old_tail = kInvalidItemID;
     if (number_opt.has_value()) {
         if (*number_opt == 1) {
-            old_head = headItem(row);
+            old_head = headItem(row_id);
         }
     } else {
-        old_tail = tailItem(row);
+        old_tail = tailItem(row_id);
     }
 
-    item->setNumber(number_opt.value_or(d_->item_table[row].size() + 1));
+    item->setNumber(number_opt.value_or(d_->item_table[row_id].size() + 1));
     emit itemAboutToBeCreated(item.get());
     // 登记item
     d_->dirty = true;
-    d_->item_table[row][item->start()] = item_id;
-    d_->item_table_helper[row][item_id] = item->start();
+    d_->item_table[row_id][item->start()] = item_id;
+    d_->item_table_helper[row_id][item_id] = item->start();
     d_->items[item_id] = std::move(item);
     emit itemCreated(item_id);
 
-    if (headItem(row) == item_id) {
+    if (headItem(row_id) == item_id) {
         requestItemOperate(item_id, QmTimelineItem::OperationRole::OpUpdateAsHead);
-    } else if (tailItem(row) == item_id) {
+    } else if (tailItem(row_id) == item_id) {
         requestItemOperate(item_id, QmTimelineItem::OperationRole::OpUpdateAsTail);
     }
 
@@ -981,7 +970,6 @@ nlohmann::json QmTimelineItemModel::saveItem(QmItemID item_id) const
 void from_json(const nlohmann::json& j, QmTimelineItemModel& model)
 {
     j["id_index"].get_to(model.d_->id_index);
-    j["row_count"].get_to(model.d_->row_count);
     j["item_table"].get_to(model.d_->item_table);
     j["item_table_helper"].get_to(model.d_->item_table_helper);
     j["hidden_rows"].get_to(model.d_->hidden_rows);

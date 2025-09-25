@@ -187,7 +187,7 @@ void QmTimelineItemView::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     if (start_bak_ == item->start()) {
         return;
     }
-    emit requestRecordMoveCommand(item_id_, start_bak_);
+    emit moveFinished(item_id_, start_bak_);
 }
 
 void QmTimelineItemView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
@@ -196,17 +196,17 @@ void QmTimelineItemView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if (!item) {
         return;
     }
-    qint64 frame_no = qRound64(event->pos().x() / sceneRef().axisFrameWidth() + item->start());
-    if (frame_no < model()->viewFrameMinimum()) {
-        frame_no = model()->viewFrameMinimum();
+    qint64 new_start = qRound64(event->pos().x() / sceneRef().axisFrameWidth() + item->start());
+    if (new_start < model()->viewFrameMinimum()) {
+        new_start = model()->viewFrameMinimum();
     }
-    if (frame_no > model()->viewFrameMaximum() - item->duration()) {
-        frame_no = model()->viewFrameMaximum() - item->duration();
+    if (new_start > model()->viewFrameMaximum() - item->duration()) {
+        new_start = model()->viewFrameMaximum() - item->duration();
     }
-    if (frame_no == item->start()) {
+    if (new_start == item->start()) {
         return;
     }
-    emit requestMoveItem(item_id_, frame_no);
+    emit requestMove(item_id_, new_start);
 }
 
 void QmTimelineItemView::refreshCache()

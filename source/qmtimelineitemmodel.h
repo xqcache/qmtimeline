@@ -135,8 +135,8 @@ protected:
 private:
     QmItemID nextItemID() const;
 
-    friend class TimelineItemCreateCommand;
-    friend class TimelineItemDeleteCommand;
+    friend class QmTimelineItemCreateCommand;
+    friend class QmTimelineItemDeleteCommand;
     virtual void loadItem(
         const nlohmann::json& j, const std::optional<QmItemID>& item_id_opt = std::nullopt, const std::optional<qint64>& start = std::nullopt);
     virtual nlohmann::json saveItem(QmItemID item_id) const;

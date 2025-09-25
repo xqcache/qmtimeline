@@ -39,8 +39,8 @@ public:
     virtual bool onItemOperateFinished(int op_role, const QVariant& param);
 
 signals:
-    void requestMoveItem(QmItemID item_id, qint64 start);
-    void requestRecordMoveCommand(QmItemID item_id, qint64 old_start);
+    void requestMove(QmItemID item_id, qint64 new_start);
+    void moveFinished(QmItemID item_id, qint64 old_start);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

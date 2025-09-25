@@ -158,8 +158,8 @@ void QmTimelineScene::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
 void QmTimelineScene::onItemCreated(QmItemID item_id)
 {
     auto item_view = QmTimelineItemFactory::instance().createItemView(item_id, this);
-    connect(item_view.get(), &QmTimelineItemView::requestMoveItem, this, &QmTimelineScene::requestMoveItem);
-    connect(item_view.get(), &QmTimelineItemView::requestRecordMoveCommand, this, &QmTimelineScene::requestRecordMoveCommand);
+    connect(item_view.get(), &QmTimelineItemView::requestMove, this, &QmTimelineScene::requestMoveItem);
+    connect(item_view.get(), &QmTimelineItemView::moveFinished, this, &QmTimelineScene::itemMoveFinished);
     d_->item_views[item_id] = std::move(item_view);
 }
 

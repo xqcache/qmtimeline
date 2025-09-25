@@ -28,6 +28,8 @@ set(PRIVATE_SOURCES
     qmtimelineitemconnview.cpp
     qmtimelineutil.h
     qmtimelineutil.cpp
+    qmtimelinetransaction.h
+    qmtimelinetransaction.cpp
 )
 
 set(_public_defines "")

@@ -72,8 +72,18 @@ bool QmTimelineItemFactory::registerItemType(int type, std::unique_ptr<QmTimelin
         return false;
     }
 
+    // 已经注册过了，就不能在注册了
+    if (d_->creator_map.contains(type)) {
+        return true;
+    }
+
     d_->creator_map[type] = std::move(creator);
     return true;
+}
+
+bool QmTimelineItemFactory::unRegisterItemType(int type)
+{
+    return d_->creator_map.erase(type) > 0;
 }
 
 } // namespace qmtl

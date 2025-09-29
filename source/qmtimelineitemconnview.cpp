@@ -130,7 +130,7 @@ QRectF QmTimelineItemConnView::calcBoundingRect() const
     }
 
     result.setWidth(width);
-    result.setHeight(scene_.model()->itemHeight());
+    result.setHeight(scene_.model()->defaultItemHeight());
     return result;
 }
 

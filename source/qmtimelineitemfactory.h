@@ -37,6 +37,7 @@ private:
     QmTimelineItemFactory();
 
     QmTimelineItemCreateor* itemTypeCreator(QmItemID item_id) const;
+    QmTimelineItemCreateor* typeCreator(int item_type) const;
 
 private:
     QmTimelineItemFactoryPrivate* d_ { nullptr };

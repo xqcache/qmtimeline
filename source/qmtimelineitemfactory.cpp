@@ -49,6 +49,11 @@ std::unique_ptr<QmTimelineItemView> QmTimelineItemFactory::createItemView(QmItem
 QmTimelineItemCreateor* QmTimelineItemFactory::itemTypeCreator(QmItemID item_id) const
 {
     int item_type = QmTimelineItemModel::itemType(item_id);
+    return typeCreator(item_type);
+}
+
+QmTimelineItemCreateor* QmTimelineItemFactory::typeCreator(int item_type) const
+{
     auto it = d_->creator_map.find(item_type);
     if (it == d_->creator_map.end()) {
         QMTL_LOG_CRITICAL("{}:{} Unknown item type {}!", __FILE__, __LINE__, item_type);
@@ -74,7 +79,8 @@ bool QmTimelineItemFactory::registerItemType(int type, std::unique_ptr<QmTimelin
 
     // 已经注册过了，就不能在注册了
     if (d_->creator_map.contains(type)) {
-        return true;
+        QMTL_LOG_ERROR("Timeline item type id '{}' already registered!", __FILE__, __LINE__, type);
+        return false;
     }
 
     d_->creator_map[type] = std::move(creator);

@@ -38,7 +38,8 @@ struct QmTimelineItemModelPrivate {
     double fps { 24.0 };
 
     bool dirty { false };
-    qreal item_height { 40 };
+    std::map<int, qreal> row_heights;
+    qreal default_item_height { 40 };
 };
 
 QmTimelineItemModel::QmTimelineItemModel(QObject* parent)
@@ -278,6 +279,22 @@ void QmTimelineItemModel::removeItem(QmItemID item_id)
     setDirty();
 }
 
+void QmTimelineItemModel::removeRow(int row_id)
+{
+    auto row_it = d_->item_table.find(row_id);
+    if (row_it != d_->item_table.end()) {
+        for (const auto& [_, item_id] : row_it->second) {
+            removeItem(item_id);
+        }
+        d_->item_table.erase(row_it);
+    }
+    d_->item_table_helper.erase(row_id);
+    d_->hidden_rows.erase(row_id);
+    d_->locked_rows.erase(row_id);
+    d_->disabled_rows.erase(row_id);
+    d_->row_heights.erase(row_id);
+}
+
 QmItemConnID QmTimelineItemModel::previousConnection(QmItemID item_id) const
 {
     auto it = d_->prev_conns.find(item_id);
@@ -468,6 +485,26 @@ bool QmTimelineItemModel::isItemDisabled(QmItemID item_id) const
     return isRowDisabled(itemRowId(item_id));
 }
 
+void QmTimelineItemModel::setRowHeight(int row_id, qreal height)
+{
+    d_->row_heights[row_id] = height;
+}
+
+qreal QmTimelineItemModel::rowHeight(int row_id) const
+{
+    auto it = d_->row_heights.find(row_id);
+    if (it == d_->row_heights.end()) {
+        return d_->default_item_height;
+    }
+    return it->second;
+}
+
+qreal QmTimelineItemModel::itemHeight(QmItemID item_id) const
+{
+    auto row_id = itemRowId(item_id);
+    return rowHeight(row_id);
+}
+
 void QmTimelineItemModel::setRowDisabled(int row, bool disabled)
 {
     if (disabled) {
@@ -487,35 +524,42 @@ int QmTimelineItemModel::rowItemCount(int row) const
     return it->second.size();
 }
 
-void QmTimelineItemModel::setItemHeight(qreal height)
+void QmTimelineItemModel::setDefaultItemHeight(qreal height)
 {
-    d_->item_height = height;
+    d_->default_item_height = height;
 }
 
-qreal QmTimelineItemModel::itemHeight() const
+qreal QmTimelineItemModel::defaultItemHeight() const
 {
-    return d_->item_height;
+    return d_->default_item_height;
 }
 
 qreal QmTimelineItemModel::itemY(QmItemID item_id) const
 {
     if (item_id == kInvalidItemID) {
-        return -2 * d_->item_height;
+        return -1000;
     }
     int row_id = itemRowId(item_id);
     if (row_id < 0) {
-        return -2 * d_->item_height;
+        return -1000;
     }
     auto row_it = d_->item_table.find(row_id);
     if (row_it == d_->item_table.end()) {
-        return -2 * d_->item_height;
+        return -1000;
     }
     if (isRowHidden(row_id)) {
-        return -2 * d_->item_height;
+        return -1000;
     }
 
-    int hidden_count = std::distance(d_->hidden_rows.begin(), d_->hidden_rows.lower_bound(row_id));
-    return (std::distance(d_->item_table.begin(), row_it) - hidden_count) * d_->item_height;
+    qreal y = 0;
+
+    for (auto it = d_->item_table.begin(); it != row_it; ++it) {
+        if (isRowHidden(it->first)) {
+            continue;
+        }
+        y += rowHeight(it->first);
+    }
+    return y;
 }
 
 QmItemID QmTimelineItemModel::headItem(int row) const
@@ -777,6 +821,7 @@ void QmTimelineItemModel::clear()
     d_->hidden_rows.clear();
     d_->locked_rows.clear();
     d_->disabled_rows.clear();
+    d_->row_heights.clear();
 }
 
 qint64 QmTimelineItemModel::frameToTime(qint64 frame_no) const

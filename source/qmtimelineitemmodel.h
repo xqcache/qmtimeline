@@ -50,11 +50,21 @@ public:
     void notifyLanguageChanged();
 
     void setRowHidden(int row_id, bool hidden);
-    bool isRowHidden(int type) const;
-    void setRowLocked(int type, bool locked);
-    bool isRowLocked(int type) const;
-    void setRowDisabled(int type, bool disabled);
-    bool isRowDisabled(int type) const;
+    bool isRowHidden(int row_id) const;
+    void setRowLocked(int row_id, bool locked);
+    bool isRowLocked(int row_id) const;
+    void setRowDisabled(int row_id, bool disabled);
+    bool isRowDisabled(int row_id) const;
+
+    void setRowHeight(int row_id, qreal height);
+    qreal rowHeight(int row_id) const;
+    qreal itemHeight(QmItemID item_id) const;
+
+    void setDefaultItemHeight(qreal height);
+    qreal defaultItemHeight() const;
+    qreal itemY(QmItemID item_id) const;
+
+    void removeRow(int row_id);
 
     bool isItemHidden(QmItemID item_id) const;
     bool isItemLocked(QmItemID item_id) const;
@@ -78,10 +88,6 @@ public:
     bool isDirty() const;
     void setDirty(bool dirty = true);
     void resetDirty();
-
-    void setItemHeight(qreal height);
-    qreal itemHeight() const;
-    qreal itemY(QmItemID item_id) const;
 
     bool isFrameInRange(qint64 start, qint64 duration = 0) const;
     bool isItemInViewRange(QmItemID item_id) const;

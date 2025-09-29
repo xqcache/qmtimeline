@@ -78,7 +78,7 @@ public:
     const QPalette& palette() const;
 
     virtual int type() const;
-    virtual const char* typeName() const = 0;
+    virtual QString typeName() const = 0;
     virtual QString toolTip() const;
 
     virtual bool setProperty(int role, const QVariant& data);

@@ -15,6 +15,8 @@ public:
     enum Feature {
         // 当范围发生变化后恢复播头的位置
         KeepPlayheadPos = 0x01,
+        // 播头位置可超出屏幕
+        PlayheadCanOverflow = 0x02,
     };
     Q_ENUM(Feature)
     Q_DECLARE_FLAGS(Features, Feature)

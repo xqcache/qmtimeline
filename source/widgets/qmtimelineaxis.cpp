@@ -86,6 +86,7 @@ void QmTimelineAxis::resizeEvent(QResizeEvent* event)
 void QmTimelineAxis::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
+    initPainter(&painter);
     painter.setRenderHint(QPainter::Antialiasing);
 
     drawPlayhead(painter);
@@ -133,6 +134,7 @@ void QmTimelineAxis::drawRuler(QPainter& painter)
     painter.drawLine(0, d_->playhead.height, width(), d_->playhead.height);
 
     QPen grid_pen = painter.pen();
+    grid_pen.setColor(Qt::gray);
     grid_pen.setStyle(Qt::DotLine);
 
     qreal tick_width = tickWidth();

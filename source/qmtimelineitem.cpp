@@ -198,6 +198,7 @@ nlohmann::json QmTimelineItem::save() const
     j["number"] = number_;
     j["start"] = start_;
     j["duration"] = duration_;
+    j["enabled"] = enabled_;
     return j;
 }
 

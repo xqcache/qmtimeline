@@ -45,6 +45,7 @@ void QmTimelineView::initUi()
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     d_->axis = new QmTimelineAxis(this);
+    d_->axis->setFeature(QmTimelineAxis::PlayheadCanOverflow);
     d_->vbar_filler = new QWidget(this);
     d_->vbar_filler->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     addScrollBarWidget(d_->vbar_filler, Qt::AlignTop);

@@ -1037,7 +1037,6 @@ void from_json(const nlohmann::json& j, QmTimelineItemModel& model)
         }
         model.d_->items[item_id] = std::move(item);
         emit model.itemCreated(item_id);
-        emit model.requestRebuildItemViewCache(item_id);
     }
 
     nlohmann::json prev_conns_j = j["prev_conns"];
@@ -1073,6 +1072,11 @@ void from_json(const nlohmann::json& j, QmTimelineItemModel& model)
     emit model.viewFrameMaximumChanged(model.d_->view_frame_range[1]);
     emit model.viewFrameMinimumChanged(model.d_->view_frame_range[0]);
     emit model.fpsChanged(model.d_->fps);
+
+    // 所有数据加载完成之后重建cache
+    for (const auto& [id, _] : model.d_->items) {
+        emit model.requestRebuildItemViewCache(id);
+    }
 }
 
 void QmTimelineItemModel::notifyLanguageChanged()

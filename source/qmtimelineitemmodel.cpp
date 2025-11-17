@@ -40,6 +40,8 @@ struct QmTimelineItemModelPrivate {
     bool dirty { false };
     std::map<int, qreal> row_heights;
     qreal default_item_height { 40 };
+
+    std::function<qreal(QmItemID)> item_y_calculator;
 };
 
 QmTimelineItemModel::QmTimelineItemModel(QObject* parent)
@@ -293,6 +295,7 @@ void QmTimelineItemModel::removeRow(int row_id)
     d_->locked_rows.erase(row_id);
     d_->disabled_rows.erase(row_id);
     d_->row_heights.erase(row_id);
+    setDirty();
 }
 
 QmItemConnID QmTimelineItemModel::previousConnection(QmItemID item_id) const
@@ -549,6 +552,10 @@ qreal QmTimelineItemModel::itemY(QmItemID item_id) const
     }
     if (isRowHidden(row_id)) {
         return -1000;
+    }
+
+    if (d_->item_y_calculator) {
+        return d_->item_y_calculator(item_id);
     }
 
     qreal y = 0;
@@ -839,6 +846,11 @@ bool QmTimelineItemModel::load(const nlohmann::json& j)
         QMTL_LOG_ERROR("Failed to load item. Exception: {}", excep.what());
     }
     return false;
+}
+
+void QmTimelineItemModel::setItemYCalculator(const std::function<qreal(QmItemID)>& y_calculator)
+{
+    d_->item_y_calculator = y_calculator;
 }
 
 nlohmann::json QmTimelineItemModel::save() const

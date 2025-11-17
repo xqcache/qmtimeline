@@ -21,6 +21,7 @@ public:
     void setSceneSize(qreal width, qreal height);
     void setSceneWidth(qreal width);
 
+    int axisPlayheadHeight() const;
     qreal axisFrameWidth() const;
     qint64 axisFrameNo() const;
     QmTimelineItemModel* model() const;

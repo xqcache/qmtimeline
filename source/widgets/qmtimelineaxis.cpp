@@ -228,6 +228,11 @@ void QmTimelineAxis::setPlayheadHeight(qreal height)
     updateRulerArea();
 }
 
+qreal QmTimelineAxis::playheadHeight() const
+{
+    return d_->playhead.height;
+}
+
 qint64 QmTimelineAxis::minimum() const
 {
     return d_->ruler.minimum;

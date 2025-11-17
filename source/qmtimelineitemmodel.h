@@ -111,6 +111,8 @@ public:
     QString copyItem(QmItemID item_id) const;
     QmItemID pasteItem(const QString& data, qint64 frame_no);
 
+    void setItemYCalculator(const std::function<qreal(QmItemID)>& y_calculator);
+
 signals:
     void itemAboutToBeCreated(QmTimelineItem* item);
     void itemCreated(QmItemID item_id);

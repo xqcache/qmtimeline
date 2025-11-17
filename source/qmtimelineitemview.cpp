@@ -92,7 +92,7 @@ QRectF QmTimelineItemView::calcBoundingRect() const
     auto duration = item->duration();
     qreal tick_width = sceneRef().axisTickWidth();
     qreal width = duration > 0 ? sceneRef().mapFrameToAxis(duration) + tick_width : tick_width;
-    qreal height = model()->defaultItemHeight();
+    qreal height = model()->itemHeight(item_id_);
     result = QRectF(-tick_width / 2.0, 0, width, height);
     return result;
 }

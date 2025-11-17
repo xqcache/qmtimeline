@@ -166,6 +166,11 @@ void QmTimelineView::setAxisPlayheadHeight(int height)
     setViewportMargins(0, height, 0, 0);
 }
 
+int QmTimelineView::axisPlayheadHeight() const
+{
+    return d_->axis->playheadHeight();
+}
+
 QmTimelineItemModel* QmTimelineView::model() const
 {
     if (!d_->scene) {

@@ -38,6 +38,7 @@ public:
     qreal frameWidth() const;
 
     void setPlayheadHeight(qreal height);
+    qreal playheadHeight() const;
 
     qreal mapFrameToAxis(qint64 frame_count) const;
     qreal mapFrameToAxisX(qint64 frame_no) const;

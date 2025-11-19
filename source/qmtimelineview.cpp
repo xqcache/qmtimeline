@@ -5,6 +5,7 @@
 #include "widgets/qmtimelineranger.h"
 #include "widgets/qmtimelinerangeslider.h"
 #include <QMouseEvent>
+#include <QScrollBar>
 
 namespace qmtl {
 
@@ -50,7 +51,7 @@ void QmTimelineView::initUi()
     d_->vbar_filler->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     addScrollBarWidget(d_->vbar_filler, Qt::AlignTop);
 
-    setSceneSize(1000000, 200);
+    setSceneSize(1000000, 200000);
     setAxisPlayheadHeight(40);
 
     setStyleSheet(R"(
@@ -288,6 +289,11 @@ void QmTimelineView::setViewMinimumInterval(qint64 interval)
 void QmTimelineView::setKeepPlayheadPos(bool on)
 {
     d_->axis->setFeature(QmTimelineAxis::KeepPlayheadPos);
+}
+
+int QmTimelineView::viewportBottomMargin() const
+{
+    return viewportMargins().bottom();
 }
 
 qreal QmTimelineView::axisFrameWidth() const

@@ -38,6 +38,8 @@ public:
     void setViewMinimumInterval(qint64 interval);
     void setKeepPlayheadPos(bool on);
 
+    int viewportBottomMargin() const;
+
 protected:
     bool event(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;

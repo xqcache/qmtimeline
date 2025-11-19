@@ -40,6 +40,8 @@ public:
 
     int viewportBottomMargin() const;
 
+    void movePlayhead(qint64 frame_no);
+
 protected:
     bool event(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;

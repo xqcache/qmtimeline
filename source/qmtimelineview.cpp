@@ -296,6 +296,11 @@ int QmTimelineView::viewportBottomMargin() const
     return viewportMargins().bottom();
 }
 
+void QmTimelineView::movePlayhead(qint64 frame_no)
+{
+    d_->axis->movePlayhead(frame_no);
+}
+
 qreal QmTimelineView::axisFrameWidth() const
 {
     return d_->axis->frameWidth();

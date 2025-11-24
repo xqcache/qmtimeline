@@ -32,7 +32,7 @@ public:
     qreal mapFrameToAxisX(qint64 time) const;
     qreal axisToSceneX(qreal x) const;
     qreal axisTickWidth() const;
-    qreal axisFrameWidth() const;
+    qreal axisFramePixels() const;
 
     QList<QmItemID> selectedItems() const;
 

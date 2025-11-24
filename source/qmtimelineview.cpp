@@ -301,7 +301,7 @@ void QmTimelineView::movePlayhead(qint64 frame_no)
     d_->axis->movePlayhead(frame_no);
 }
 
-qreal QmTimelineView::axisFrameWidth() const
+qreal QmTimelineView::axisFramePixels() const
 {
     return d_->axis->frameWidth();
 }

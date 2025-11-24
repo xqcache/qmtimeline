@@ -111,7 +111,7 @@ qreal QmTimelineScene::axisTickWidth() const
     return 40;
 }
 
-qreal QmTimelineScene::axisFrameWidth() const
+qreal QmTimelineScene::axisFramePixels() const
 {
     if (!d_->view) {
         return 1.0;

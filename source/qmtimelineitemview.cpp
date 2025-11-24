@@ -196,7 +196,7 @@ void QmTimelineItemView::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     if (!item) {
         return;
     }
-    qint64 new_start = qRound64(event->pos().x() / sceneRef().axisFrameWidth() + item->start());
+    qint64 new_start = qRound64(event->pos().x() / sceneRef().axisFramePixels() + item->start());
     if (new_start < model()->viewFrameMinimum()) {
         new_start = model()->viewFrameMinimum();
     }

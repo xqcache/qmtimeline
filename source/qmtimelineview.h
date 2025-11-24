@@ -22,7 +22,8 @@ public:
     void setSceneWidth(qreal width);
 
     int axisPlayheadHeight() const;
-    qreal axisFrameWidth() const;
+    // 关键帧的像素宽度
+    qreal axisFramePixels() const;
     qint64 axisFrameNo() const;
     QmTimelineItemModel* model() const;
 

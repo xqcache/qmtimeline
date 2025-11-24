@@ -1,10 +1,13 @@
 #include "qmtimelineview.h"
 #include "qmtimelineitemmodel.h"
+#include "qmtimelineitemview.h"
 #include "qmtimelinescene.h"
 #include "widgets/qmtimelineaxis.h"
 #include "widgets/qmtimelineranger.h"
 #include "widgets/qmtimelinerangeslider.h"
 #include <QMouseEvent>
+#include <QPainterPath>
+#include <QRubberBand>
 #include <QScrollBar>
 
 namespace qmtl {
@@ -14,7 +17,10 @@ struct QmTimelineViewPrivate {
     QmTimelineAxis* axis { nullptr };
     QmTimelineScene* scene { nullptr };
     QmTimelineRanger* ranger { nullptr };
+    QRubberBand* rubber_band { nullptr };
     QList<QMetaObject::Connection> model_connections;
+    bool multi_selectable { false };
+    bool rubber_band_pressed { false };
 };
 
 QmTimelineView::QmTimelineView(QWidget* parent)
@@ -88,6 +94,72 @@ bool QmTimelineView::event(QEvent* event)
         break;
     }
     return QGraphicsView::event(event);
+}
+
+bool QmTimelineView::viewportEvent(QEvent* event)
+{
+    switch (event->type()) {
+    case QEvent::MouseButtonPress:
+
+        break;
+    default:
+        break;
+    }
+    return QGraphicsView::viewportEvent(event);
+}
+
+void QmTimelineView::mousePressEvent(QMouseEvent* event)
+{
+    if (d_->multi_selectable) {
+        auto origin = viewport()->mapFromParent(event->pos());
+        if (itemAt(origin)) {
+            QGraphicsView::mousePressEvent(event);
+            return;
+        }
+
+        if (event->buttons() == Qt::LeftButton && event->modifiers() == Qt::NoModifier) {
+            if (!d_->rubber_band) {
+                d_->rubber_band = new QRubberBand(QRubberBand::Rectangle, viewport());
+            }
+            d_->rubber_band->setProperty("Origin", origin);
+            d_->rubber_band->setGeometry(QRect(origin, QSize()));
+            d_->rubber_band->show();
+            d_->rubber_band_pressed = true;
+            return;
+        }
+    }
+    QGraphicsView::mousePressEvent(event);
+}
+
+void QmTimelineView::mouseMoveEvent(QMouseEvent* event)
+{
+    if (d_->rubber_band_pressed) {
+        d_->rubber_band->setGeometry(QRect(d_->rubber_band->property("Origin").toPoint(), viewport()->mapFromParent(event->pos())).normalized());
+        return;
+    }
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void QmTimelineView::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (d_->rubber_band_pressed) {
+        d_->rubber_band->hide();
+        auto rect = mapToScene(d_->rubber_band->geometry()).boundingRect();
+        if (rect.isValid()) {
+            QPainterPath selection_path;
+            selection_path.addRect(rect);
+            scene()->setSelectionArea(selection_path);
+            return;
+        } else {
+            scene()->clearSelection();
+        }
+    }
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+void QmTimelineView::setMultiSelectable(bool selectable)
+{
+    d_->multi_selectable = true;
 }
 
 void QmTimelineView::resizeEvent(QResizeEvent* event)

@@ -43,11 +43,17 @@ public:
 
     void movePlayhead(qint64 frame_no);
 
+    void setMultiSelectable(bool selectable);
+
 protected:
     bool event(QEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
     void drawBackground(QPainter* painter, const QRectF& rect) override;
+    bool viewportEvent(QEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
     void initUi();

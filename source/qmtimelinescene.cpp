@@ -22,7 +22,6 @@ QmTimelineScene::QmTimelineScene(QmTimelineItemModel* model, QObject* parent)
     : QGraphicsScene(parent)
     , d_(new QmTimelineScenePrivate)
 {
-    d_->undo_stack = new QUndoStack(this);
     d_->model = model;
     connect(model, &QmTimelineItemModel::itemCreated, this, &QmTimelineScene::onItemCreated);
     connect(model, &QmTimelineItemModel::itemChanged, this, &QmTimelineScene::onItemChanged);
@@ -282,11 +281,17 @@ void QmTimelineScene::onRebuildItemViewCacheRequested(QmItemID item_id)
 
 void QmTimelineScene::recordUndo(QUndoCommand* command)
 {
+    if (!d_->undo_stack) {
+        return;
+    }
     d_->undo_stack->push(command);
 }
 
 void QmTimelineScene::undo()
 {
+    if (!d_->undo_stack) {
+        return;
+    }
     if (d_->undo_stack->canUndo()) {
         d_->undo_stack->undo();
     }
@@ -294,6 +299,9 @@ void QmTimelineScene::undo()
 
 void QmTimelineScene::redo()
 {
+    if (!d_->undo_stack) {
+        return;
+    }
     if (d_->undo_stack->canRedo()) {
         d_->undo_stack->redo();
     }
@@ -302,5 +310,10 @@ void QmTimelineScene::redo()
 QUndoStack* QmTimelineScene::undoStack() const
 {
     return d_->undo_stack;
+}
+
+void QmTimelineScene::setUndoStack(QUndoStack* stack)
+{
+    d_->undo_stack = stack;
 }
 } // namespace qmtl

@@ -43,6 +43,7 @@ public:
     void redo();
     void recordUndo(QUndoCommand* command);
     QUndoStack* undoStack() const;
+    void setUndoStack(QUndoStack* stack);
 
 signals:
     void requestSceneContextMenu();

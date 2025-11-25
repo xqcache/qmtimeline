@@ -19,7 +19,7 @@ struct QmTimelineAxisPrivate {
 
     struct Ruler {
         QMarginsF margins { 20, 0, 20, 0 };
-        qreal frame_width { 0 };
+        qreal frame_pixels { 0 };
         qreal tick_width { 0 };
         qint64 minimum { 0 };
         qint64 maximum { 1 };
@@ -40,7 +40,7 @@ QmTimelineAxis::QmTimelineAxis(QmTimelineView* view)
 {
     d_->view = view;
     d_->ruler.tick_width = maxTickLabelWidth();
-    d_->ruler.frame_width = innerWidth() / static_cast<qreal>(frameCount());
+    d_->ruler.frame_pixels = innerWidth() / static_cast<qreal>(frameCount());
     setMouseTracking(true);
 }
 
@@ -106,7 +106,7 @@ void QmTimelineAxis::drawPlayhead(QPainter& painter)
     painter.setOpacity(0.8);
 
     qreal x = d_->playhead.x + d_->ruler.margins.left();
-    qreal w = qMax(frameWidth(), 2.0);
+    qreal w = qMax(framePixels(), 2.0);
 
     painter.setPen(Qt::NoPen);
     painter.drawRect(x, 0, w, height());
@@ -203,13 +203,13 @@ bool QmTimelineAxis::handleMouseReleaseEvent(QMouseEvent* event)
 
 void QmTimelineAxis::updatePlayheadX(qreal x, bool force)
 {
-    x = qint64(x / frameWidth()) * frameWidth();
-    x = qMin(qMax(0.0, x), (frameCount() - 1) * frameWidth());
+    x = qint64(x / framePixels()) * framePixels();
+    x = qMin(qMax(0.0, x), (frameCount() - 1) * framePixels());
 
     if (qFuzzyCompare(x, d_->playhead.x)) {
         if (force) {
             d_->playhead.x = x;
-            update(x, 0, frameWidth(), height());
+            update(x, 0, framePixels(), height());
         }
         return;
     }
@@ -298,9 +298,9 @@ qreal QmTimelineAxis::tickWidth() const
     return d_->ruler.tick_width;
 }
 
-qreal QmTimelineAxis::frameWidth() const
+qreal QmTimelineAxis::framePixels() const
 {
-    return d_->ruler.frame_width;
+    return d_->ruler.frame_pixels;
 }
 
 qint64 QmTimelineAxis::frameCount() const
@@ -349,7 +349,7 @@ qint64 QmTimelineAxis::frame() const
 
 qreal QmTimelineAxis::mapFrameToAxis(qint64 frame_count) const
 {
-    return static_cast<qreal>(frame_count) * frameWidth();
+    return static_cast<qreal>(frame_count) * framePixels();
 }
 
 qreal QmTimelineAxis::mapFrameToAxisX(qint64 frame_no) const
@@ -359,8 +359,8 @@ qreal QmTimelineAxis::mapFrameToAxisX(qint64 frame_no) const
 
 void QmTimelineAxis::updateTickWidth()
 {
-    d_->ruler.frame_width = innerWidth() / static_cast<double>(frameCount());
-    d_->ruler.tick_width = d_->ruler.frame_width;
+    d_->ruler.frame_pixels = innerWidth() / static_cast<double>(frameCount());
+    d_->ruler.tick_width = d_->ruler.frame_pixels;
     if (d_->ruler.tick_width < maxTickLabelWidth()) {
         d_->ruler.tick_width *= 1 + qRound64(maxTickLabelWidth() / d_->ruler.tick_width);
     }
@@ -370,7 +370,7 @@ void QmTimelineAxis::movePlayhead(qint64 frame_no)
 {
     qreal x = mapFrameToAxis(frame_no - d_->ruler.minimum);
     if (!(d_->features & PlayheadCanOverflow)) {
-        x = qMin(qMax(0.0, x), (frameCount() - 1) * frameWidth());
+        x = qMin(qMax(0.0, x), (frameCount() - 1) * framePixels());
     }
     if (qFuzzyCompare(x, d_->playhead.x)) {
         return;

@@ -35,7 +35,7 @@ public:
     qint64 maximum() const;
 
     qint64 frame() const;
-    qreal frameWidth() const;
+    qreal framePixels() const;
 
     void setPlayheadHeight(qreal height);
     qreal playheadHeight() const;

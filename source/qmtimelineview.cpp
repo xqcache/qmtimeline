@@ -110,6 +110,7 @@ bool QmTimelineView::viewportEvent(QEvent* event)
 
 void QmTimelineView::mousePressEvent(QMouseEvent* event)
 {
+    d_->rubber_band_pressed = false;
     if (d_->multi_selectable) {
         auto origin = viewport()->mapFromParent(event->pos());
         if (itemAt(origin)) {
@@ -143,6 +144,7 @@ void QmTimelineView::mouseMoveEvent(QMouseEvent* event)
 void QmTimelineView::mouseReleaseEvent(QMouseEvent* event)
 {
     if (d_->rubber_band_pressed) {
+        d_->rubber_band_pressed = false;
         d_->rubber_band->hide();
         auto rect = mapToScene(d_->rubber_band->geometry()).boundingRect();
         if (rect.isValid()) {
@@ -375,7 +377,7 @@ void QmTimelineView::movePlayhead(qint64 frame_no)
 
 qreal QmTimelineView::axisFramePixels() const
 {
-    return d_->axis->frameWidth();
+    return d_->axis->framePixels();
 }
 
 qint64 QmTimelineView::axisFrameNo() const

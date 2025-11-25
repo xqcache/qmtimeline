@@ -116,7 +116,7 @@ qreal QmTimelineScene::axisFramePixels() const
     if (!d_->view) {
         return 1.0;
     }
-    return d_->view->frameWidth();
+    return d_->view->axisFramePixels();
 }
 
 void QmTimelineScene::fitInAxis()
